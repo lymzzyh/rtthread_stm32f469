@@ -29,5 +29,8 @@ int main(void)
         rt_kprintf("File System init failed!\n"); 
     }
     
+    rt_device_t device = rt_device_find("lcd"); 
+    rt_device_open(device, RT_DEVICE_OFLAG_RDWR); 
+    
     return 0;
 }

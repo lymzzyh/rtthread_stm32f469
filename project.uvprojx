@@ -51,9 +51,9 @@
           <OutputName>rtthread-stm32f4xx</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\build\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -369,7 +369,7 @@
             <ScatterFile>.\stm32_rom.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc> --keep *.o(.rti_fn.*)   --keep *.o(FSymTab)</Misc>
+            <Misc>--keep *.o(.rti_fn.*)   --keep *.o(FSymTab)</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>
@@ -405,6 +405,11 @@
               <FilePath>drivers\drv_sdcard.c</FilePath>
             </File>
             <File>
+              <FileName>drv_sdram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>drivers\drv_sdram.c</FilePath>
+            </File>
+            <File>
               <FileName>drv_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>drivers\drv_gpio.c</FilePath>
@@ -415,14 +420,19 @@
               <FilePath>drivers\drv_usart.c</FilePath>
             </File>
             <File>
+              <FileName>drv_lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\drivers\drv_lcd.c</FilePath>
+            </File>
+            <File>
               <FileName>drv_romfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>drivers\drv_romfs.c</FilePath>
             </File>
             <File>
-              <FileName>drv_sdram.c</FileName>
+              <FileName>otm8009a.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\drivers\drv_sdram.c</FilePath>
+              <FilePath>.\drivers\otm8009a.c</FilePath>
             </File>
           </Files>
         </Group>

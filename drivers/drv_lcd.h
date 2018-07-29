@@ -1,5 +1,5 @@
 /*
- * File      : drv_sdram.h 
+ * File      : drv_lcd.h 
  * This file is part of RT-Thread RTOS
  * COPYRIGHT (C) 2015, RT-Thread Development Team
  *
@@ -9,15 +9,16 @@
  *
  * Change Logs:
  * Date           Author         Notes
- * 2018-07-28     liu2guang      the first version for STM32F469NI-Discovery. 
+ * 2018-07-28     liu2guang      the first version
  */
  
-#ifndef __DRV_SDRAM_H_ 
-#define __DRV_SDRAM_H_ 
+#ifndef __DRV_LCD_H_ 
+#define __DRV_LCD_H_ 
 
-#include <rtthread.h>  
+#include <rtthread.h> 
+#include <rtdevice.h>
 #include <board.h> 
 
-int rt_hw_sdram_init(void); 
+int rt_hw_lcd_init(void); 
 
 #endif

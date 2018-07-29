@@ -385,7 +385,7 @@ extern int __bss_end;
 #define HEAP_SIZE   ((uint32_t)HEAP_END - (uint32_t)HEAP_BEGIN)
 
 #define SDRAM_BEGIN (0xC0000000u)
-#define SDRAM_END   (0xC1000000u)
+#define SDRAM_END   (0xC0800000u)
 
 extern void rt_hw_board_init(void);
 

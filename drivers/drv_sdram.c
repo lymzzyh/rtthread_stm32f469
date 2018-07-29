@@ -9,7 +9,8 @@
  *
  * Change Logs:
  * Date           Author         Notes
- * 2018-07-28     liu2guang      the first version for STM32F469NI-Discovery. 
+ * 2018-07-28     liu2guang      the first version for STM32F469NI-Discovery
+ *                               MICRON MT48LC4M32B2B5-6A. 
  */
  
 #include "drv_sdram.h"
