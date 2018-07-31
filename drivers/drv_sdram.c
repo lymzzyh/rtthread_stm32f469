@@ -160,7 +160,7 @@ static rt_err_t stm32_sdram_init(void)
     
     TimStructure.LoadToActiveDelay       = 2; 
     TimStructure.ExitSelfRefreshDelay    = 7; 
-    TimStructure.SelfRefreshTime         = 7; 
+    TimStructure.SelfRefreshTime         = 4; 
     TimStructure.RowCycleDelay           = 7; 
     TimStructure.WriteRecoveryTime       = 2; 
     TimStructure.RPDelay                 = 2; 

@@ -18,19 +18,18 @@
 #include <dfs_file.h>
 #endif
 
+#include "drv_lcd.h"
+
 int main(void)
 {
     if (dfs_mount("sd0", "/mnt/sd", "elm", 0, 0) == 0)
     {
-        rt_kprintf("File System initialized!\n"); 
+        rt_kprintf("File System initialized!\n");
     }
     else
     {
-        rt_kprintf("File System init failed!\n"); 
+        rt_kprintf("File System init failed!\n");
     }
-    
-    rt_device_t device = rt_device_find("lcd"); 
-    rt_device_open(device, RT_DEVICE_OFLAG_RDWR); 
     
     return 0;
 }

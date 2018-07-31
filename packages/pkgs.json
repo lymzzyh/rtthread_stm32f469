@@ -1,0 +1,12 @@
+[
+ {
+  "path": "/packages/misc/libcsv", 
+  "ver": "v3.0.3", 
+  "name": "LIBCSV"
+ }, 
+ {
+  "path": "/packages/misc/optparse", 
+  "ver": "v1.0.0", 
+  "name": "OPTPARSE"
+ }
+]

@@ -12,132 +12,269 @@
  * 2018-07-28     liu2guang      the first version for STM32F469NI-Discovery.
  */
 
-#include "drv_lcd.h"
+#include "drv_lcd.h" 
 
-#define LCD_RESET_PIN (103)
-
-/* 横屏模式 */
-#define LCD_WIDTH     ((rt_uint32_t)480)
-#define LCD_HEIGHT    ((rt_uint32_t)800)
-
-#define LCD_HSYNC     ((rt_uint32_t) 2)
-#define LCD_HFP       ((rt_uint32_t)34)
-#define LCD_HBP       ((rt_uint32_t)34)
-
-#define LCD_VSYNC     ((rt_uint32_t) 1)
-#define LCD_VFP       ((rt_uint32_t)15)
-#define LCD_VBP       ((rt_uint32_t)16)
-
-LTDC_HandleTypeDef  LTDC_Handle; 
-DSI_HandleTypeDef   DSI_Handle; 
-DSI_VidCfgTypeDef   DSI_VideoStru; 
-DMA2D_HandleTypeDef DMA2D_Handle; 
-
-#define LCD_FB_START_ADDRESS ((uint32_t)0xC0800000)
-
-static rt_err_t otm8009a_init(void); 
-static void otm8009a_reset(void); 
-static void otm8009a_display_on(void); 
-static void otm8009a_display_off(void); 
-static void otm8009a_config(rt_uint32_t color_coding); 
-
-/* 长数据的格式 */
-static const rt_uint8_t l_data01[] = {0x80, 0x09, 0x01, 0xFF};
-static const rt_uint8_t l_data02[] = {0x80, 0x09, 0xFF};
-static const rt_uint8_t l_data03[] = {0x00, 0x09, 0x0F, 0x0E, 0x07, 0x10, 0x0B, 0x0A, 0x04, 0x07, 0x0B, 0x08, 0x0F, 0x10, 0x0A, 0x01, 0xE1};
-static const rt_uint8_t l_data04[] = {0x00, 0x09, 0x0F, 0x0E, 0x07, 0x10, 0x0B, 0x0A, 0x04, 0x07, 0x0B, 0x08, 0x0F, 0x10, 0x0A, 0x01, 0xE2};
-static const rt_uint8_t l_data05[] = {0x79, 0x79, 0xD8};
-static const rt_uint8_t l_data06[] = {0x00, 0x01, 0xB3};
-static const rt_uint8_t l_data07[] = {0x85, 0x01, 0x00, 0x84, 0x01, 0x00, 0xCE};
-static const rt_uint8_t l_data08[] = {0x18, 0x04, 0x03, 0x39, 0x00, 0x00, 0x00, 0x18, 0x03, 0x03, 0x3A, 0x00, 0x00, 0x00, 0xCE};
-static const rt_uint8_t l_data09[] = {0x18, 0x02, 0x03, 0x3B, 0x00, 0x00, 0x00, 0x18, 0x01, 0x03, 0x3C, 0x00, 0x00, 0x00, 0xCE};
-static const rt_uint8_t l_data10[] = {0x01, 0x01, 0x20, 0x20, 0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0xCF};
-static const rt_uint8_t l_data11[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
-static const rt_uint8_t l_data12[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
-static const rt_uint8_t l_data13[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
-static const rt_uint8_t l_data14[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
-static const rt_uint8_t l_data15[] = {0x00, 0x04, 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
-static const rt_uint8_t l_data16[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00, 0xCB};
-static const rt_uint8_t l_data17[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
-static const rt_uint8_t l_data18[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xCB};
-static const rt_uint8_t l_data19[] = {0x00, 0x26, 0x09, 0x0B, 0x01, 0x25, 0x00, 0x00, 0x00, 0x00, 0xCC};
-static const rt_uint8_t l_data20[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x26, 0x0A, 0x0C, 0x02, 0xCC};
-static const rt_uint8_t l_data21[] = {0x25, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCC};
-static const rt_uint8_t l_data22[] = {0x00, 0x25, 0x0C, 0x0A, 0x02, 0x26, 0x00, 0x00, 0x00, 0x00, 0xCC};
-static const rt_uint8_t l_data23[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x25, 0x0B, 0x09, 0x01, 0xCC};
-static const rt_uint8_t l_data24[] = {0x26, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCC};
-static const rt_uint8_t l_data25[] = {0xFF, 0xFF, 0xFF, 0xFF};
-static const rt_uint8_t l_data27[] = {0x00, 0x00, 0x03, 0x1F, 0x2A};
-static const rt_uint8_t l_data28[] = {0x00, 0x00, 0x01, 0xDF, 0x2B};
-
-/* 短数据的格式 */
-static const rt_uint8_t s_data01[] = {0x00, 0x00};
-static const rt_uint8_t s_data02[] = {0x00, 0x80};
-static const rt_uint8_t s_data03[] = {0xC4, 0x30};
-static const rt_uint8_t s_data04[] = {0x00, 0x8A};
-static const rt_uint8_t s_data05[] = {0xC4, 0x40};
-static const rt_uint8_t s_data06[] = {0x00, 0xB1};
-static const rt_uint8_t s_data07[] = {0xC5, 0xA9};
-static const rt_uint8_t s_data08[] = {0x00, 0x91};
-static const rt_uint8_t s_data09[] = {0xC5, 0x34};
-static const rt_uint8_t s_data10[] = {0x00, 0xB4};
-static const rt_uint8_t s_data11[] = {0xC0, 0x50};
-static const rt_uint8_t s_data12[] = {0xD9, 0x4E};
-static const rt_uint8_t s_data13[] = {0x00, 0x81};
-static const rt_uint8_t s_data14[] = {0xC1, 0x66};
-static const rt_uint8_t s_data15[] = {0x00, 0xA1};
-static const rt_uint8_t s_data16[] = {0xC1, 0x08};
-static const rt_uint8_t s_data17[] = {0x00, 0x92};
-static const rt_uint8_t s_data18[] = {0xC5, 0x01};
-static const rt_uint8_t s_data19[] = {0x00, 0x95};
-static const rt_uint8_t s_data20[] = {0x00, 0x94};
-static const rt_uint8_t s_data21[] = {0xC5, 0x33};
-static const rt_uint8_t s_data22[] = {0x00, 0xA3};
-static const rt_uint8_t s_data23[] = {0xC0, 0x1B};
-static const rt_uint8_t s_data24[] = {0x00, 0x82};
-static const rt_uint8_t s_data25[] = {0xC5, 0x83};
-static const rt_uint8_t s_data26[] = {0xC4, 0x83};
-static const rt_uint8_t s_data27[] = {0xC1, 0x0E};
-static const rt_uint8_t s_data28[] = {0x00, 0xA6};
-static const rt_uint8_t s_data29[] = {0x00, 0xA0};
-static const rt_uint8_t s_data30[] = {0x00, 0xB0};
-static const rt_uint8_t s_data31[] = {0x00, 0xC0};
-static const rt_uint8_t s_data32[] = {0x00, 0xD0};
-static const rt_uint8_t s_data33[] = {0x00, 0x90};
-static const rt_uint8_t s_data34[] = {0x00, 0xE0};
-static const rt_uint8_t s_data35[] = {0x00, 0xF0};
-static const rt_uint8_t s_data36[] = {0x11, 0x00};
-static const rt_uint8_t s_data37[] = {0x3A, 0x55};
-static const rt_uint8_t s_data38[] = {0x3A, 0x77};
-static const rt_uint8_t s_data39[] = {0x36, 0x60};
-static const rt_uint8_t s_data40[] = {0x51, 0x7F};
-static const rt_uint8_t s_data41[] = {0x53, 0x2C};
-static const rt_uint8_t s_data42[] = {0x55, 0x02};
-static const rt_uint8_t s_data43[] = {0x5E, 0xFF};
-static const rt_uint8_t s_data44[] = {0x29, 0x00};
-static const rt_uint8_t s_data45[] = {0x2C, 0x00};
-static const rt_uint8_t s_data46[] = {0xCF, 0x00};
-static const rt_uint8_t s_data47[] = {0xC5, 0x66};
-static const rt_uint8_t s_data48[] = {0x00, 0xB6};
-static const rt_uint8_t s_data49[] = {0xF5, 0x06};
-static const rt_uint8_t s_data50[] = {0x00, 0xB1};
-static const rt_uint8_t s_data51[] = {0xC6, 0x06};
-
-static rt_err_t otm8009a_init(void)
+struct stm32_lcd
 {
-    /* otm8009a reset pin */ 
-    rt_pin_mode(LCD_RESET_PIN, PIN_MODE_OUTPUT); 
+    struct rt_device device;
+    struct rt_device_graphic_info info; 
     
-    uint32_t LcdClk          = 27429;
-    uint32_t LaneByteClk_kHz = 62500;
+    LTDC_HandleTypeDef  ltdc;
+    DSI_HandleTypeDef   dsi;
+    DSI_VidCfgTypeDef   dsi_video;
+    DMA2D_HandleTypeDef dma2d;
+};
+static struct stm32_lcd lcd; 
 
+#define  LCD_WIDTH    ((uint16_t)800) 
+#define  LCD_HEIGHT   ((uint16_t)480) 
+
+#define  LCD_HSYNC    ((uint16_t)1) 
+#define  LCD_HBP      ((uint16_t)15) 
+#define  LCD_HFP      ((uint16_t)16) 
+#define  LCD_VSYNC    ((uint16_t)2) 
+#define  LCD_VBP      ((uint16_t)34) 
+#define  LCD_VFP      ((uint16_t)34) 
+
+const rt_uint8_t RDL01[] = {0x80, 0x09, 0x01, 0xFF};
+const rt_uint8_t RDL02[] = {0x80, 0x09, 0xFF};
+const rt_uint8_t RDL03[] = {0x00, 0x09, 0x0F, 0x0E, 0x07, 0x10, 0x0B, 0x0A, 0x04, 0x07, 0x0B, 0x08, 0x0F, 0x10, 0x0A, 0x01, 0xE1};
+const rt_uint8_t RDL04[] = {0x00, 0x09, 0x0F, 0x0E, 0x07, 0x10, 0x0B, 0x0A, 0x04, 0x07, 0x0B, 0x08, 0x0F, 0x10, 0x0A, 0x01, 0xE2};
+const rt_uint8_t RDL05[] = {0x79, 0x79, 0xD8};
+const rt_uint8_t RDL06[] = {0x00, 0x01, 0xB3};
+const rt_uint8_t RDL07[] = {0x85, 0x01, 0x00, 0x84, 0x01, 0x00, 0xCE};
+const rt_uint8_t RDL08[] = {0x18, 0x04, 0x03, 0x39, 0x00, 0x00, 0x00, 0x18, 0x03, 0x03, 0x3A, 0x00, 0x00, 0x00, 0xCE};
+const rt_uint8_t RDL09[] = {0x18, 0x02, 0x03, 0x3B, 0x00, 0x00, 0x00, 0x18, 0x01, 0x03, 0x3C, 0x00, 0x00, 0x00, 0xCE};
+const rt_uint8_t RDL10[] = {0x01, 0x01, 0x20, 0x20, 0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0xCF};
+const rt_uint8_t RDL11[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
+const rt_uint8_t RDL12[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
+const rt_uint8_t RDL13[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
+const rt_uint8_t RDL14[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
+const rt_uint8_t RDL15[] = {0x00, 0x04, 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
+const rt_uint8_t RDL16[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00, 0xCB};
+const rt_uint8_t RDL17[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCB};
+const rt_uint8_t RDL18[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xCB};
+const rt_uint8_t RDL19[] = {0x00, 0x26, 0x09, 0x0B, 0x01, 0x25, 0x00, 0x00, 0x00, 0x00, 0xCC};
+const rt_uint8_t RDL20[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x26, 0x0A, 0x0C, 0x02, 0xCC};
+const rt_uint8_t RDL21[] = {0x25, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCC};
+const rt_uint8_t RDL22[] = {0x00, 0x25, 0x0C, 0x0A, 0x02, 0x26, 0x00, 0x00, 0x00, 0x00, 0xCC};
+const rt_uint8_t RDL23[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x25, 0x0B, 0x09, 0x01, 0xCC};
+const rt_uint8_t RDL24[] = {0x26, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xCC};
+const rt_uint8_t RDL25[] = {0xFF, 0xFF, 0xFF, 0xFF};
+const rt_uint8_t RDL27[] = {0x00, 0x00, 0x03, 0x1F, 0x2A};
+const rt_uint8_t RDL28[] = {0x00, 0x00, 0x01, 0xDF, 0x2B};
+
+const rt_uint8_t RDS01[] = {0x00, 0x00};
+const rt_uint8_t RDS02[] = {0x00, 0x80};
+const rt_uint8_t RDS03[] = {0xC4, 0x30};
+const rt_uint8_t RDS04[] = {0x00, 0x8A};
+const rt_uint8_t RDS05[] = {0xC4, 0x40};
+const rt_uint8_t RDS06[] = {0x00, 0xB1};
+const rt_uint8_t RDS07[] = {0xC5, 0xA9};
+const rt_uint8_t RDS08[] = {0x00, 0x91};
+const rt_uint8_t RDS09[] = {0xC5, 0x34};
+const rt_uint8_t RDS10[] = {0x00, 0xB4};
+const rt_uint8_t RDS11[] = {0xC0, 0x50};
+const rt_uint8_t RDS12[] = {0xD9, 0x4E};
+const rt_uint8_t RDS13[] = {0x00, 0x81};
+const rt_uint8_t RDS14[] = {0xC1, 0x66};
+const rt_uint8_t RDS15[] = {0x00, 0xA1};
+const rt_uint8_t RDS16[] = {0xC1, 0x08};
+const rt_uint8_t RDS17[] = {0x00, 0x92};
+const rt_uint8_t RDS18[] = {0xC5, 0x01};
+const rt_uint8_t RDS19[] = {0x00, 0x95};
+const rt_uint8_t RDS20[] = {0x00, 0x94};
+const rt_uint8_t RDS21[] = {0xC5, 0x33};
+const rt_uint8_t RDS22[] = {0x00, 0xA3};
+const rt_uint8_t RDS23[] = {0xC0, 0x1B};
+const rt_uint8_t RDS24[] = {0x00, 0x82};
+const rt_uint8_t RDS25[] = {0xC5, 0x83};
+const rt_uint8_t RDS26[] = {0xC4, 0x83};
+const rt_uint8_t RDS27[] = {0xC1, 0x0E};
+const rt_uint8_t RDS28[] = {0x00, 0xA6};
+const rt_uint8_t RDS29[] = {0x00, 0xA0};
+const rt_uint8_t RDS30[] = {0x00, 0xB0};
+const rt_uint8_t RDS31[] = {0x00, 0xC0};
+const rt_uint8_t RDS32[] = {0x00, 0xD0};
+const rt_uint8_t RDS33[] = {0x00, 0x90};
+const rt_uint8_t RDS34[] = {0x00, 0xE0};
+const rt_uint8_t RDS35[] = {0x00, 0xF0};
+const rt_uint8_t RDS36[] = {0x11, 0x00};
+const rt_uint8_t RDS37[] = {0x3A, 0x55};
+const rt_uint8_t RDS38[] = {0x3A, 0x77};
+const rt_uint8_t RDS39[] = {0x36, 0x60};
+const rt_uint8_t RDS40[] = {0x51, 0x7F};
+const rt_uint8_t RDS41[] = {0x53, 0x2C};
+const rt_uint8_t RDS42[] = {0x55, 0x02};
+const rt_uint8_t RDS43[] = {0x5E, 0xFF};
+const rt_uint8_t RDS44[] = {0x29, 0x00};
+const rt_uint8_t RDS45[] = {0x2C, 0x00};
+const rt_uint8_t RDS46[] = {0xCF, 0x00};
+const rt_uint8_t RDS47[] = {0xC5, 0x66};
+const rt_uint8_t RDS48[] = {0x00, 0xB6};
+const rt_uint8_t RDS49[] = {0xF5, 0x06};
+const rt_uint8_t RDS50[] = {0x00, 0xB1};
+const rt_uint8_t RDS51[] = {0xC6, 0x06};
+
+static void otm8009a_reset(void) 
+{
+    rt_pin_mode (103, PIN_MODE_OUTPUT); 
+    rt_pin_write(103, PIN_LOW);
+    rt_thread_delay(rt_tick_from_millisecond(20));
+    rt_pin_write(103, PIN_HIGH);
+    rt_thread_delay(rt_tick_from_millisecond(20));
+}
+
+void otm8009a_write_cmd(uint8_t *p, uint32_t num)
+{
+    if (num <= 1)
+    {
+        HAL_DSI_ShortWrite(&(lcd.dsi), lcd.dsi_video.VirtualChannelID, DSI_DCS_SHORT_PKT_WRITE_P1, p[0], p[1]);
+    }
+    else
+    {
+        HAL_DSI_LongWrite(&(lcd.dsi), lcd.dsi_video.VirtualChannelID, DSI_DCS_LONG_PKT_WRITE, num, p[num], p);
+    }
+}
+
+void otm8009a_delay(uint32_t d)
+{
+    rt_thread_delay(rt_tick_from_millisecond(d)); 
+}
+
+static void otm8009a_config(rt_uint32_t pixel_format)
+{
+    otm8009a_write_cmd((rt_uint8_t *)RDS01, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL01, 3);
+    otm8009a_write_cmd((rt_uint8_t *)RDS02, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL02, 2);
+    otm8009a_write_cmd((rt_uint8_t *)RDS02, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS03, 0);
+    otm8009a_delay(10); 
+
+    otm8009a_write_cmd((rt_uint8_t *)RDS04, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS05, 0);
+    otm8009a_delay(10); 
+
+    otm8009a_write_cmd((rt_uint8_t *)RDS06, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS07, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS08, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS09, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS10, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS11, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS01, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS12, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS13, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS14, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS15, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS16, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS17, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS18, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS19, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS09, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS01, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL05, 2);
+    otm8009a_write_cmd((rt_uint8_t *)RDS20, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS21, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS22, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS23, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS24, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS25, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS13, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS26, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS15, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS27, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS28, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL06, 2);
+    otm8009a_write_cmd((rt_uint8_t *)RDS02, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL07, 6);
+    otm8009a_write_cmd((rt_uint8_t *)RDS29, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL08, 14);
+    otm8009a_write_cmd((rt_uint8_t *)RDS30, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL09, 14);
+    otm8009a_write_cmd((rt_uint8_t *)RDS31, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL10, 10);
+    otm8009a_write_cmd((rt_uint8_t *)RDS32, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS46, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS02, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL11, 10);
+    otm8009a_write_cmd((rt_uint8_t *)RDS33, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL12, 15);
+    otm8009a_write_cmd((rt_uint8_t *)RDS29, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL13, 15);
+    otm8009a_write_cmd((rt_uint8_t *)RDS30, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL14, 10);
+    otm8009a_write_cmd((rt_uint8_t *)RDS31, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL15, 15);
+    otm8009a_write_cmd((rt_uint8_t *)RDS32, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL16, 15);
+    otm8009a_write_cmd((rt_uint8_t *)RDS34, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL17, 10);
+    otm8009a_write_cmd((rt_uint8_t *)RDS35, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL18, 10);
+    otm8009a_write_cmd((rt_uint8_t *)RDS02, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL19, 10);
+    otm8009a_write_cmd((rt_uint8_t *)RDS33, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL20, 15);
+    otm8009a_write_cmd((rt_uint8_t *)RDS29, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL21, 15);
+    otm8009a_write_cmd((rt_uint8_t *)RDS30, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL22, 10);
+    otm8009a_write_cmd((rt_uint8_t *)RDS31, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL23, 15);
+    otm8009a_write_cmd((rt_uint8_t *)RDS32, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL24, 15);
+    otm8009a_write_cmd((rt_uint8_t *)RDS13, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS47, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS48, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS49, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS50, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS51, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS01, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL25, 3);
+    otm8009a_write_cmd((rt_uint8_t *)RDS01, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS01, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL03, 16);
+    otm8009a_write_cmd((rt_uint8_t *)RDS01, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL04, 16);
+    otm8009a_write_cmd((rt_uint8_t *)RDS36, 0);
+    otm8009a_delay(120); 
+    
+    switch (pixel_format)
+    {
+    case RTGRAPHIC_PIXEL_FORMAT_RGB565:
+        otm8009a_write_cmd((rt_uint8_t *)RDS37, 0);
+        break;
+    case RTGRAPHIC_PIXEL_FORMAT_RGB888:
+    case RTGRAPHIC_PIXEL_FORMAT_ARGB888:
+        otm8009a_write_cmd((rt_uint8_t *)RDS38, 0);
+        break;
+    }
+
+    otm8009a_write_cmd((rt_uint8_t *)RDS39, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDL27, 4);
+    otm8009a_write_cmd((rt_uint8_t *)RDL28, 4);
+    otm8009a_write_cmd((rt_uint8_t *)RDS40, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS41, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS42, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS43, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS44, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS01, 0);
+    otm8009a_write_cmd((rt_uint8_t *)RDS45, 0);
+}
+
+rt_err_t otm8009a_init(void)
+{
+    uint32_t lcd_clock      = 27429; 
+    uint32_t lanebyte_clock = 62500;
+    
     uint32_t HSA = LCD_HSYNC, HFP = LCD_HFP, HBP = LCD_HBP, HACT = LCD_WIDTH;
     uint32_t VSA = LCD_VSYNC, VFP = LCD_VFP, VBP = LCD_VBP, VACT = LCD_HEIGHT;
     
-    /* Reset */
+    /* 复位OTM8009A显示屏 */ 
     otm8009a_reset(); 
     
-    /* Init lcd clock */ 
+    /* 初始化STM32显示屏时钟 */ 
     __HAL_RCC_LTDC_CLK_ENABLE();
     __HAL_RCC_LTDC_FORCE_RESET();
     __HAL_RCC_LTDC_RELEASE_RESET();
@@ -148,306 +285,188 @@ static rt_err_t otm8009a_init(void)
 
     __HAL_RCC_DSI_CLK_ENABLE();
     __HAL_RCC_DSI_FORCE_RESET();
-    __HAL_RCC_DSI_RELEASE_RESET(); 
+    __HAL_RCC_DSI_RELEASE_RESET();
     
-    HAL_NVIC_SetPriority(LTDC_IRQn, 3, 0);
-    HAL_NVIC_EnableIRQ(LTDC_IRQn);
-    
-    HAL_NVIC_SetPriority(DMA2D_IRQn, 3, 0);
-    HAL_NVIC_EnableIRQ(DMA2D_IRQn);
-    
-    HAL_NVIC_SetPriority(DSI_IRQn, 3, 0);
-    HAL_NVIC_EnableIRQ(DSI_IRQn);
-
-    /* INIT DSI */ 
-    DSI_PLLInitTypeDef DSI_PLLInit; 
-    DSI_PHY_TimerTypeDef PHY_Timings;
-    
-    DSI_Handle.Instance = DSI; 
-    DSI_Handle.Init.TXEscapeCkdiv = LaneByteClk_kHz / 15620;
-    DSI_Handle.Init.NumberOfLanes = DSI_TWO_DATA_LANES;
-    
-    DSI_PLLInit.PLLNDIV = 125;
-    DSI_PLLInit.PLLIDF  = DSI_PLL_IN_DIV2;
-    DSI_PLLInit.PLLODF  = DSI_PLL_OUT_DIV1; 
-    
-    HAL_DSI_DeInit(&DSI_Handle);
-    HAL_DSI_Init(&DSI_Handle, &DSI_PLLInit); 
-    
-    DSI_VideoStru.VirtualChannelID = 0;
-    DSI_VideoStru.ColorCoding      = DSI_RGB888;
-    //DSI_VideoStru.LooselyPacked    = DSI_LOOSELY_PACKED_DISABLE;
-    DSI_VideoStru.Mode             = DSI_VID_MODE_BURST;
-    DSI_VideoStru.PacketSize       = HACT;
-    DSI_VideoStru.NumberOfChunks   = 0;
-    DSI_VideoStru.NullPacketSize   = 0xFFF;
-
-    DSI_VideoStru.HSPolarity       = DSI_HSYNC_ACTIVE_HIGH;
-    DSI_VideoStru.VSPolarity       = DSI_VSYNC_ACTIVE_HIGH;
-    DSI_VideoStru.DEPolarity       = DSI_DATA_ENABLE_ACTIVE_HIGH;
-
-    DSI_VideoStru.HorizontalSyncActive = HSA * (LaneByteClk_kHz / LcdClk);
-    DSI_VideoStru.HorizontalBackPorch  = HBP * (LaneByteClk_kHz / LcdClk);
-    DSI_VideoStru.HorizontalLine       = (HACT + HSA + HBP + HFP) * (LaneByteClk_kHz / LcdClk);
-    DSI_VideoStru.VerticalSyncActive   = VSA;
-    DSI_VideoStru.VerticalBackPorch    = VBP;
-    DSI_VideoStru.VerticalFrontPorch   = VFP;
-    DSI_VideoStru.VerticalActive       = VACT;
-
-    DSI_VideoStru.LPCommandEnable = DSI_LP_COMMAND_ENABLE;
-
-    DSI_VideoStru.LPLargestPacketSize     = 16;
-    DSI_VideoStru.LPVACTLargestPacketSize = 0;
-
-    DSI_VideoStru.LPHorizontalFrontPorchEnable = DSI_LP_HFP_ENABLE;
-    DSI_VideoStru.LPHorizontalBackPorchEnable  = DSI_LP_HBP_ENABLE;
-    DSI_VideoStru.LPVerticalActiveEnable       = DSI_LP_VACT_ENABLE;
-    DSI_VideoStru.LPVerticalFrontPorchEnable   = DSI_LP_VFP_ENABLE;
-    DSI_VideoStru.LPVerticalBackPorchEnable    = DSI_LP_VBP_ENABLE;
-    DSI_VideoStru.LPVerticalSyncActiveEnable   = DSI_LP_VSYNC_ENABLE;
-
-    HAL_DSI_ConfigVideoMode(&DSI_Handle, &DSI_VideoStru); 
-    
-    PHY_Timings.ClockLaneHS2LPTime  = 35;
-    PHY_Timings.ClockLaneLP2HSTime  = 35;
-    PHY_Timings.DataLaneHS2LPTime   = 35;
-    PHY_Timings.DataLaneLP2HSTime   = 35;
-    PHY_Timings.DataLaneMaxReadTime = 0;
-    PHY_Timings.StopWaitTime        = 10;
-    HAL_DSI_ConfigPhyTimer(&DSI_Handle, &PHY_Timings);
-    
-    /* INIT LTDC */ 
-    static RCC_PeriphCLKInitTypeDef PeriphClkInitStruct; 
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
     
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC;
     PeriphClkInitStruct.PLLSAI.PLLSAIN       = 384;
     PeriphClkInitStruct.PLLSAI.PLLSAIR       = 7;
     PeriphClkInitStruct.PLLSAIDivR           = RCC_PLLSAIDIVR_2;
     HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
+    
+    /* 配置NVIC */ 
+    HAL_NVIC_SetPriority(LTDC_IRQn,  3, 0);
+    HAL_NVIC_SetPriority(DMA2D_IRQn, 3, 0);
+    HAL_NVIC_SetPriority(DSI_IRQn,   3, 0);
 
-    LTDC_Handle.Instance                = LTDC; 
-    LTDC_Handle.Init.PCPolarity         = LTDC_PCPOLARITY_IPC;
-    LTDC_Handle.Init.HorizontalSync     = (HSA - 1);
-    LTDC_Handle.Init.AccumulatedHBP     = (HSA + HBP - 1);
-    LTDC_Handle.Init.AccumulatedActiveW = (LCD_WIDTH  + HSA + HBP - 1);
-    LTDC_Handle.Init.TotalWidth         = (LCD_HEIGHT + HSA + HBP + HFP - 1);
+    HAL_NVIC_EnableIRQ(LTDC_IRQn);
+    HAL_NVIC_EnableIRQ(DMA2D_IRQn);
+    HAL_NVIC_EnableIRQ(DSI_IRQn);
     
-    LTDC_Handle.Init.Backcolor.Red      = 30;
-    LTDC_Handle.Init.Backcolor.Green    = 160;
-    LTDC_Handle.Init.Backcolor.Blue     = 132;
+    /* 配置DSI */ 
+    DSI_PLLInitTypeDef dsi_pll;
     
-    LTDC_Handle.LayerCfg->ImageWidth  = LCD_WIDTH;
-    LTDC_Handle.LayerCfg->ImageHeight = LCD_HEIGHT;
-
-    HAL_LTDCEx_StructInitFromVideoConfig(&LTDC_Handle, &DSI_VideoStru);
-    HAL_LTDC_Init(&LTDC_Handle); 
+    lcd.dsi.Instance = DSI; 
+    lcd.dsi.Init.NumberOfLanes = DSI_TWO_DATA_LANES;
+    lcd.dsi.Init.TXEscapeCkdiv = lanebyte_clock / 15620;
     
-    HAL_DSI_Start(&DSI_Handle);
+    dsi_pll.PLLNDIV  = 125;
+    dsi_pll.PLLIDF   = DSI_PLL_IN_DIV2;
+    dsi_pll.PLLODF   = DSI_PLL_OUT_DIV1; 
     
-    /* Config otm8009a */ 
-    otm8009a_config(DSI_VideoStru.ColorCoding); 
+    HAL_DSI_DeInit(&(lcd.dsi)); 
+    HAL_DSI_Init(&(lcd.dsi), &(dsi_pll)); 
     
-    return RT_EOK;
+    /* 配置DSI Video */ 
+    lcd.dsi_video.VirtualChannelID             = 0;
+    lcd.dsi_video.ColorCoding                  = DSI_RGB888;
+    lcd.dsi_video.VSPolarity                   = DSI_VSYNC_ACTIVE_HIGH;
+    lcd.dsi_video.HSPolarity                   = DSI_HSYNC_ACTIVE_HIGH;
+    lcd.dsi_video.DEPolarity                   = DSI_DATA_ENABLE_ACTIVE_HIGH;
+    lcd.dsi_video.Mode                         = DSI_VID_MODE_BURST; 
+    lcd.dsi_video.NullPacketSize               = 0xFFF;
+    lcd.dsi_video.NumberOfChunks               = 0;
+    lcd.dsi_video.PacketSize                   = HACT; 
+    lcd.dsi_video.HorizontalSyncActive         = (HSA * lanebyte_clock) / lcd_clock;
+    lcd.dsi_video.HorizontalBackPorch          = (HBP * lanebyte_clock) / lcd_clock;
+    lcd.dsi_video.HorizontalLine               = ((HACT + HSA + HBP + HFP) * lanebyte_clock) / lcd_clock; 
+    lcd.dsi_video.VerticalSyncActive           = VSA;
+    lcd.dsi_video.VerticalBackPorch            = VBP;
+    lcd.dsi_video.VerticalFrontPorch           = VFP;
+    lcd.dsi_video.VerticalActive               = VACT; 
+    lcd.dsi_video.LPCommandEnable              = DSI_LP_COMMAND_ENABLE; 
+    lcd.dsi_video.LPLargestPacketSize          = 16;
+    lcd.dsi_video.LPVACTLargestPacketSize      = 0;
+    lcd.dsi_video.LPHorizontalFrontPorchEnable = DSI_LP_HFP_ENABLE; 
+    lcd.dsi_video.LPHorizontalBackPorchEnable  = DSI_LP_HBP_ENABLE; 
+    lcd.dsi_video.LPVerticalActiveEnable       = DSI_LP_VACT_ENABLE; 
+    lcd.dsi_video.LPVerticalFrontPorchEnable   = DSI_LP_VFP_ENABLE; 
+    lcd.dsi_video.LPVerticalBackPorchEnable    = DSI_LP_VBP_ENABLE; 
+    lcd.dsi_video.LPVerticalSyncActiveEnable   = DSI_LP_VSYNC_ENABLE; 
+    HAL_DSI_ConfigVideoMode(&(lcd.dsi), &(lcd.dsi_video)); 
+    
+    /* 配置DSI PHY */ 
+    DSI_PHY_TimerTypeDef dsi_phy;
+    
+    dsi_phy.ClockLaneHS2LPTime  = 35;
+    dsi_phy.ClockLaneLP2HSTime  = 35;
+    dsi_phy.DataLaneHS2LPTime   = 35;
+    dsi_phy.DataLaneLP2HSTime   = 35;
+    dsi_phy.DataLaneMaxReadTime = 0;
+    dsi_phy.StopWaitTime        = 10;
+    HAL_DSI_ConfigPhyTimer(&(lcd.dsi), &dsi_phy); 
+    
+    /* 配置LTDC */ 
+    lcd.ltdc.Instance = LTDC;
+    
+    lcd.ltdc.Init.PCPolarity         = LTDC_PCPOLARITY_IPC;
+    lcd.ltdc.Init.HorizontalSync     = (HSA - 1);
+    lcd.ltdc.Init.AccumulatedHBP     = (HSA + HBP - 1);
+    lcd.ltdc.Init.AccumulatedActiveW = (LCD_WIDTH + HSA + HBP - 1);
+    lcd.ltdc.Init.TotalWidth         = (LCD_WIDTH + HSA + HBP + HFP - 1);
+    
+    lcd.ltdc.LayerCfg->ImageWidth    = LCD_WIDTH;
+    lcd.ltdc.LayerCfg->ImageHeight   = LCD_HEIGHT; 
+    lcd.ltdc.Init.Backcolor.Blue     = 0x00;
+    lcd.ltdc.Init.Backcolor.Green    = 0x00;
+    lcd.ltdc.Init.Backcolor.Red      = 0x00;
+    HAL_LTDCEx_StructInitFromVideoConfig(&(lcd.ltdc), &(lcd.dsi_video)); 
+    HAL_LTDC_Init(&(lcd.ltdc));
+    
+    HAL_DSI_Start(&(lcd.dsi)); 
+    
+    otm8009a_config(RTGRAPHIC_PIXEL_FORMAT_ARGB888); 
+    
+    return RT_EOK; 
 }
 
-static void otm8009a_reset(void)
+void otm8009a_layer_init(uint16_t index, uint32_t framebuffer)
 {
-    rt_pin_write(LCD_RESET_PIN, PIN_LOW);
-    rt_thread_delay(rt_tick_from_millisecond(20));
-    
-    rt_pin_write(LCD_RESET_PIN, PIN_HIGH);
-    rt_thread_delay(rt_tick_from_millisecond(20));
+    LTDC_LayerCfgTypeDef layer_cfg;
+
+    layer_cfg.WindowX0        = 0;
+    layer_cfg.WindowX1        = LCD_WIDTH; 
+    layer_cfg.WindowY0        = 0;
+    layer_cfg.WindowY1        = LCD_HEIGHT;
+    layer_cfg.PixelFormat     = LTDC_PIXEL_FORMAT_ARGB8888;
+    layer_cfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
+    layer_cfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
+    layer_cfg.Alpha           = 255;
+    layer_cfg.Alpha0          = 0;
+    layer_cfg.ImageWidth      = LCD_WIDTH;
+    layer_cfg.ImageHeight     = LCD_HEIGHT;
+    layer_cfg.Backcolor.Blue  = 0;
+    layer_cfg.Backcolor.Green = 0;
+    layer_cfg.Backcolor.Red   = 0;
+    layer_cfg.FBStartAdress   = framebuffer;
+
+    HAL_LTDC_ConfigLayer(&(lcd.ltdc), &layer_cfg, index);
 }
 
 static void otm8009a_display_on(void)
 {
-    HAL_DSI_ShortWrite(&DSI_Handle, DSI_VideoStru.VirtualChannelID, DSI_DCS_SHORT_PKT_WRITE_P1, 0x29, 0x00);
+    HAL_DSI_ShortWrite(&(lcd.dsi), lcd.dsi_video.VirtualChannelID, DSI_DCS_SHORT_PKT_WRITE_P1, 0x29, 0x00);
 }
 
 static void otm8009a_display_off(void)
 {
-    HAL_DSI_ShortWrite(&DSI_Handle, DSI_VideoStru.VirtualChannelID, DSI_DCS_SHORT_PKT_WRITE_P1, 0x28, 0x00);
-}
-
-static void otm8009a_send_cmd(rt_uint8_t *params, rt_uint32_t num)
-{
-    if(num <= 1)
-    {
-        HAL_DSI_ShortWrite(&DSI_Handle, DSI_VideoStru.VirtualChannelID, 
-            DSI_DCS_SHORT_PKT_WRITE_P1, params[0], params[1]);
-    }
-    else
-    {
-        HAL_DSI_LongWrite(&DSI_Handle, DSI_VideoStru.VirtualChannelID, 
-            DSI_DCS_LONG_PKT_WRITE, num, params[num], params);
-    }
-}
-
-void DSI_IO_WriteCmd(uint32_t NbrParams, uint8_t *pParams)
-{
-    if(NbrParams <= 1)
-    {
-        HAL_DSI_ShortWrite(&DSI_Handle, DSI_VideoStru.VirtualChannelID, 
-            DSI_DCS_SHORT_PKT_WRITE_P1, pParams[0], pParams[1]);
-    }
-    else
-    {
-        HAL_DSI_LongWrite(&DSI_Handle, DSI_VideoStru.VirtualChannelID, 
-            DSI_DCS_LONG_PKT_WRITE, NbrParams, pParams[NbrParams], pParams);
-    }
-}
-
-static void otm8009a_config(rt_uint32_t color_coding)
-{
-    otm8009a_send_cmd((rt_uint8_t *)s_data01, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data01, 3);
-
-    otm8009a_send_cmd((rt_uint8_t *)s_data02, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data02, 2);
-
-    otm8009a_send_cmd((rt_uint8_t *)s_data02, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data03, 0);
-    rt_thread_delay(rt_tick_from_millisecond(10));
-    
-    otm8009a_send_cmd((rt_uint8_t *)s_data04, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data05, 0);
-    rt_thread_delay(rt_tick_from_millisecond(10));
-
-    otm8009a_send_cmd((rt_uint8_t *)s_data06, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data07, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data08, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data09, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data10, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data11, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data01, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data12, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data13, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data14, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data15, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data16, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data17, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data18, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data19, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data09, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data01, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data05, 2);
-    otm8009a_send_cmd((rt_uint8_t *)s_data20, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data21, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data22, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data23, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data24, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data25, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data13, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data26, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data15, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data27, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data28, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data06, 2);
-    otm8009a_send_cmd((rt_uint8_t *)s_data02, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data07, 6);
-    otm8009a_send_cmd((rt_uint8_t *)s_data29, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data08, 14);
-    otm8009a_send_cmd((rt_uint8_t *)s_data30, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data09, 14);
-    otm8009a_send_cmd((rt_uint8_t *)s_data31, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data10, 10);
-    otm8009a_send_cmd((rt_uint8_t *)s_data32, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data46, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data02, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data11, 10);
-    otm8009a_send_cmd((rt_uint8_t *)s_data33, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data12, 15);
-    otm8009a_send_cmd((rt_uint8_t *)s_data29, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data13, 15);
-    otm8009a_send_cmd((rt_uint8_t *)s_data30, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data14, 10);
-    otm8009a_send_cmd((rt_uint8_t *)s_data31, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data15, 15);
-    otm8009a_send_cmd((rt_uint8_t *)s_data32, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data16, 15);
-    otm8009a_send_cmd((rt_uint8_t *)s_data34, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data17, 10);
-    otm8009a_send_cmd((rt_uint8_t *)s_data35, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data18, 10);
-    otm8009a_send_cmd((rt_uint8_t *)s_data02, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data19, 10);
-    otm8009a_send_cmd((rt_uint8_t *)s_data33, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data20, 15);
-    otm8009a_send_cmd((rt_uint8_t *)s_data29, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data21, 15);
-    otm8009a_send_cmd((rt_uint8_t *)s_data30, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data22, 10);
-    otm8009a_send_cmd((rt_uint8_t *)s_data31, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data23, 15);
-    otm8009a_send_cmd((rt_uint8_t *)s_data32, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data24, 15);
-    otm8009a_send_cmd((rt_uint8_t *)s_data13, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data47, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data48, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data49, 0);
-    
-    otm8009a_send_cmd((rt_uint8_t *)s_data50, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data51, 0);
-    
-    otm8009a_send_cmd((rt_uint8_t *)s_data01, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data25, 3);
-    
-    otm8009a_send_cmd((rt_uint8_t *)s_data01, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data01, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data03, 16);
-    otm8009a_send_cmd((rt_uint8_t *)s_data01, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data04, 16);
-    otm8009a_send_cmd((rt_uint8_t *)s_data36, 0);
-    rt_thread_delay(rt_tick_from_millisecond(120));
-
-    switch(color_coding)
-    {
-    case DSI_RGB565:
-        otm8009a_send_cmd((rt_uint8_t *)s_data37, 0);
-        break;
-
-    case DSI_RGB888:
-        otm8009a_send_cmd((rt_uint8_t *)s_data38, 0);
-        break;
-    }
-
-    /* LCD_LANDSCAPE */ 
-    otm8009a_send_cmd((rt_uint8_t *)s_data39, 0);
-    otm8009a_send_cmd((rt_uint8_t *)l_data27, 4);
-    otm8009a_send_cmd((rt_uint8_t *)l_data28, 4);
-
-    otm8009a_send_cmd((rt_uint8_t *)s_data40, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data41, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data42, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data43, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data44, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data01, 0);
-    otm8009a_send_cmd((rt_uint8_t *)s_data45, 0);
+    HAL_DSI_ShortWrite(&(lcd.dsi), lcd.dsi_video.VirtualChannelID, DSI_DCS_SHORT_PKT_WRITE_P1, 0x28, 0x00);
 }
 
 void LTDC_IRQHandler(void)
 {
-    HAL_LTDC_IRQHandler(&LTDC_Handle);
+    rt_interrupt_enter();
+    HAL_LTDC_IRQHandler(&(lcd.ltdc)); 
+    rt_interrupt_leave();
 }
 
-struct stm32_lcd
+/* 测试代码: ---------------------------------------- */ 
+static void lcd_fill_buffer(void *addr, uint32_t x_size, uint32_t y_size, uint32_t offset, uint32_t color)
 {
-    struct rt_device device;
-    struct rt_device_graphic_info info; 
+    lcd.dma2d.Instance = DMA2D;
     
-    rt_uint32_t *frame_buffer; 
-};
-static struct stm32_lcd lcd;
+    lcd.dma2d.Init.Mode         = DMA2D_R2M;
+    lcd.dma2d.Init.ColorMode    = DMA2D_ARGB8888;
+    lcd.dma2d.Init.OutputOffset = offset;
+    
+    if (HAL_DMA2D_Init(&lcd.dma2d) == HAL_OK)
+    {
+        if (HAL_DMA2D_ConfigLayer(&lcd.dma2d, 0) == HAL_OK)
+        {
+            if (HAL_DMA2D_Start(&lcd.dma2d, color, (uint32_t)addr, x_size, y_size) == HAL_OK)
+            {
+                HAL_DMA2D_PollForTransfer(&lcd.dma2d, 10);
+            }
+        }
+    }
+} 
+
+void lcd_clear(uint32_t color)
+{
+    /* Clear the LCD */
+    lcd_fill_buffer((uint32_t *)(lcd.ltdc.LayerCfg[0].FBStartAdress), LCD_WIDTH, LCD_HEIGHT, 0, color);
+}
+
+void lcd_fill_rect(uint16_t x_pos, uint16_t y_pos, uint16_t width, uint16_t height)
+{
+    uint32_t Xaddress = (lcd.ltdc.LayerCfg[0].FBStartAdress) + 4 * (LCD_WIDTH * x_pos + y_pos);
+    lcd_fill_buffer((uint32_t *)Xaddress, width, height, (LCD_WIDTH - width), 0xFF00FF00);
+}
+
+/* 测试代码 ----------------------------------------- */
 
 static rt_err_t stm32_lcd_init(rt_device_t device)
 {
     otm8009a_init(); 
+    otm8009a_layer_init(0, (uint32_t)0xC0800000); 
+    lcd_clear(0xFF000000); 
     
     lcd.info.width          = LCD_WIDTH;
     lcd.info.height         = LCD_HEIGHT;
     lcd.info.pixel_format   = RTGRAPHIC_PIXEL_FORMAT_ARGB888;
     lcd.info.bits_per_pixel = 32;
-    lcd.info.framebuffer    = (void *)(lcd.frame_buffer); 
+    lcd.info.framebuffer    = (void *)(0xC0800000); 
     
     return RT_EOK;
 }

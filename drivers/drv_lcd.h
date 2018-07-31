@@ -19,6 +19,9 @@
 #include <rtdevice.h>
 #include <board.h> 
 
-int rt_hw_lcd_init(void); 
+rt_err_t otm8009a_init(void); 
+void otm8009a_layer_init(uint16_t index, uint32_t framebuffer); 
+void lcd_clear(uint32_t color); 
+void lcd_fill_rect(uint16_t x_pos, uint16_t y_pos, uint16_t width, uint16_t height); 
 
 #endif
