@@ -1,0 +1,37 @@
+{
+    "configurations": [
+        {
+            "intelliSenseMode": "clang-x64",
+            "name": "Win32",
+            "cppStandard": "c++11",
+            "cStandard": "c99",
+            "compilerPath": "D:/ArdaArmTools/GNUARM_4.9_2015q1/bin/arm-none-eabi-gcc",
+            "includePath": [
+                "G:/embedded/GitHub/rt-thread/components/dfs/filesystems/devfs",
+                "G:/embedded/GitHub/rt-thread/components/dfs/filesystems/elmfat",
+                "G:/embedded/GitHub/rt-thread/components/dfs/filesystems/romfs",
+                "G:/embedded/GitHub/rt-thread/components/dfs/include",
+                "G:/embedded/GitHub/rt-thread/components/drivers/include",
+                "G:/embedded/GitHub/rt-thread/components/finsh",
+                "G:/embedded/GitHub/rt-thread/components/libc/compilers/newlib",
+                "G:/embedded/GitHub/rt-thread/include",
+                "G:/embedded/GitHub/rt-thread/libcpu/arm/common",
+                "G:/embedded/GitHub/rt-thread/libcpu/arm/cortex-m4",
+                "G:/embedded/GitHub/rtthread_stm32f469",
+                "G:/embedded/GitHub/rtthread_stm32f469/Libraries/CMSIS/Device/ST/STM32F4xx/Include",
+                "G:/embedded/GitHub/rtthread_stm32f469/Libraries/CMSIS/Include",
+                "G:/embedded/GitHub/rtthread_stm32f469/Libraries/STM32F4xx_HAL_Driver/Inc",
+                "G:/embedded/GitHub/rtthread_stm32f469/applications",
+                "G:/embedded/GitHub/rtthread_stm32f469/drivers"
+            ],
+            "defines": [
+                "HAVE_CCONFIG_H",
+                "RT_USING_NEWLIB",
+                "STM32F469xx",
+                "USE_HAL_DRIVER",
+                "__GNUC__"
+            ]
+        }
+    ],
+    "version": 4
+}

@@ -30,6 +30,8 @@ int main(void)
     {
         rt_kprintf("File System init failed!\n");
     }
+
+    rt_kprintf("hello\n");
     
     return 0;
 }
