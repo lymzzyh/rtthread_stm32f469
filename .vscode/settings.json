@@ -6,5 +6,8 @@
         "RTT_EXEC_PATH":"D:\\software\\env\\tools\\gnu_gcc\\arm_gcc\\mingw\\bin"
     },
     "python.pythonPath": "D:\\software\\Python\\Python37\\python.exe",
-    "python.linting.enabled": false
+    "python.linting.enabled": false,
+    "files.associations": {
+        "libxray.h": "c"
+    }
 }

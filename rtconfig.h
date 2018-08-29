@@ -11,11 +11,12 @@
 #define RT_THREAD_PRIORITY_32
 #define RT_THREAD_PRIORITY_MAX 32
 #define RT_TICK_PER_SECOND 1000
-#define RT_USING_OVERFLOW_CHECK
-#define RT_USING_HOOK
-#define RT_IDEL_HOOK_LIST_SIZE 4
-#define IDLE_THREAD_STACK_SIZE 256
 #define RT_DEBUG
+#define RT_USING_OVERFLOW_CHECK
+#define RT_DEBUG_INIT 0
+#define RT_DEBUG_THREAD 0
+#define RT_USING_HOOK
+#define IDLE_THREAD_STACK_SIZE 256
 
 /* Inter-Thread communication */
 
@@ -88,9 +89,15 @@
 /* Device Drivers */
 
 #define RT_USING_DEVICE_IPC
-#define RT_PIPE_BUFSZ 512
 #define RT_USING_SERIAL
+#define RT_USING_I2C
+#define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
+#define RT_USING_SPI
+#define RT_USING_SFUD
+#define RT_SFUD_USING_SFDP
+#define RT_SFUD_USING_FLASH_INFO_TABLE
+#define RT_DEBUG_SFUD
 
 /* Using USB */
 
@@ -99,18 +106,12 @@
 
 #define RT_USING_LIBC
 
-/* Network */
-
-/* Socket abstraction layer */
-
+/* Network stack */
 
 /* light weight TCP/IP stack */
 
 
 /* Modbus master and slave stack */
-
-
-/* AT commands */
 
 
 /* VBUS(Virtual Software BUS) */
@@ -132,6 +133,9 @@
 /* Wiced WiFi */
 
 
+/* IoT Cloud */
+
+
 /* security packages */
 
 
@@ -146,19 +150,6 @@
 
 /* system packages */
 
-#define PKG_USING_LITTLEVGL2RTT
-#define PKG_USING_LITTLEVGL2RTT_V001
-
-/* LittlevGL2RTT Options */
-
-#define LV_MEM_DYNAMIC
-#define LV_MEM_CUSTOM 1
-#define LV_COLOR_DEPTH_24
-#define LV_COLOR_DEPTH 24
-#define LV_HOR_RES 800
-#define LV_VER_RES 480
-#define LV_DPI 50
-#define LITTLEVGL2RTT_USING_DEMO
 
 /* peripheral libraries and drivers */
 
@@ -168,6 +159,8 @@
 
 /* sample package */
 
+/* samples: kernel and components samples */
+
 
 /* example package: hello */
 
@@ -175,6 +168,6 @@
 #define RT_HSE_VALUE 8000000
 #define RT_HSE_HCLK 180000000
 #define RT_USING_UART3
-#define RT_USING_UART6
+#define RT_USING_SPI1
 
 #endif

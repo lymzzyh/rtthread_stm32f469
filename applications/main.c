@@ -22,16 +22,10 @@
 
 int main(void)
 {
-    if (dfs_mount("sd0", "/mnt/sd", "elm", 0, 0) == 0)
-    {
-        rt_kprintf("File System initialized!\n");
-    }
-    else
+    if (dfs_mount("sd0", "/mnt/sd", "elm", 0, 0) != 0)
     {
         rt_kprintf("File System init failed!\n");
     }
-
-    rt_kprintf("hello\n");
     
     return 0;
 }
