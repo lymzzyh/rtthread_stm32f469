@@ -4,6 +4,8 @@
 /* Automatically generated file; DO NOT EDIT. */
 /* RT-Thread Configuration */
 
+#define RTT_DIR "rt-thread"
+
 /* RT-Thread Kernel */
 
 #define RT_NAME_MAX 8
@@ -43,6 +45,7 @@
 #define RT_USING_COMPONENTS_INIT
 #define RT_USING_USER_MAIN
 #define RT_MAIN_THREAD_STACK_SIZE 2048
+#define RT_MAIN_THREAD_PRIORITY 10
 
 /* C++ features */
 
@@ -90,7 +93,14 @@
 #define RT_USING_DEVICE_IPC
 #define RT_PIPE_BUFSZ 512
 #define RT_USING_SERIAL
+#define RT_USING_I2C
+#define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
+#define RT_USING_SPI
+#define RT_USING_SFUD
+#define RT_SFUD_USING_SFDP
+#define RT_SFUD_USING_FLASH_INFO_TABLE
+#define RT_DEBUG_SFUD
 
 /* Using USB */
 
@@ -132,6 +142,9 @@
 /* Wiced WiFi */
 
 
+/* IoT Cloud */
+
+
 /* security packages */
 
 
@@ -146,19 +159,6 @@
 
 /* system packages */
 
-#define PKG_USING_LITTLEVGL2RTT
-#define PKG_USING_LITTLEVGL2RTT_V001
-
-/* LittlevGL2RTT Options */
-
-#define LV_MEM_DYNAMIC
-#define LV_MEM_CUSTOM 1
-#define LV_COLOR_DEPTH_24
-#define LV_COLOR_DEPTH 24
-#define LV_HOR_RES 800
-#define LV_VER_RES 480
-#define LV_DPI 50
-#define LITTLEVGL2RTT_USING_DEMO
 
 /* peripheral libraries and drivers */
 
@@ -168,13 +168,31 @@
 
 /* sample package */
 
+/* samples: kernel and components samples */
+
 
 /* example package: hello */
+
+
+/* Privated Packages of RealThread */
+
+
+/* Network Utilities */
+
+
+/* RT-Thread Senior Membership Packages */
+
+/* system packages */
+
+
+/* IoT - internet of things */
+
+/* Webnet: A web server package for rt-thread */
 
 #define SOC_STM32F469NI
 #define RT_HSE_VALUE 8000000
 #define RT_HSE_HCLK 180000000
 #define RT_USING_UART3
-#define RT_USING_UART6
+#define RT_USING_SPI1
 
 #endif
