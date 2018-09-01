@@ -4,6 +4,8 @@
 /* Automatically generated file; DO NOT EDIT. */
 /* RT-Thread Configuration */
 
+#define RTT_DIR "rt-thread"
+
 /* RT-Thread Kernel */
 
 #define RT_NAME_MAX 8
@@ -11,12 +13,11 @@
 #define RT_THREAD_PRIORITY_32
 #define RT_THREAD_PRIORITY_MAX 32
 #define RT_TICK_PER_SECOND 1000
-#define RT_DEBUG
 #define RT_USING_OVERFLOW_CHECK
-#define RT_DEBUG_INIT 0
-#define RT_DEBUG_THREAD 0
 #define RT_USING_HOOK
+#define RT_IDEL_HOOK_LIST_SIZE 4
 #define IDLE_THREAD_STACK_SIZE 256
+#define RT_DEBUG
 
 /* Inter-Thread communication */
 
@@ -44,6 +45,7 @@
 #define RT_USING_COMPONENTS_INIT
 #define RT_USING_USER_MAIN
 #define RT_MAIN_THREAD_STACK_SIZE 2048
+#define RT_MAIN_THREAD_PRIORITY 10
 
 /* C++ features */
 
@@ -89,6 +91,7 @@
 /* Device Drivers */
 
 #define RT_USING_DEVICE_IPC
+#define RT_PIPE_BUFSZ 512
 #define RT_USING_SERIAL
 #define RT_USING_I2C
 #define RT_USING_I2C_BITOPS
@@ -106,12 +109,18 @@
 
 #define RT_USING_LIBC
 
-/* Network stack */
+/* Network */
+
+/* Socket abstraction layer */
+
 
 /* light weight TCP/IP stack */
 
 
 /* Modbus master and slave stack */
+
+
+/* AT commands */
 
 
 /* VBUS(Virtual Software BUS) */
@@ -163,6 +172,22 @@
 
 
 /* example package: hello */
+
+
+/* Privated Packages of RealThread */
+
+
+/* Network Utilities */
+
+
+/* RT-Thread Senior Membership Packages */
+
+/* system packages */
+
+
+/* IoT - internet of things */
+
+/* Webnet: A web server package for rt-thread */
 
 #define SOC_STM32F469NI
 #define RT_HSE_VALUE 8000000
