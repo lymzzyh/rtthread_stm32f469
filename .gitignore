@@ -26,3 +26,6 @@ tools/kconfig-frontends/kconfig-mconf
 cconfig.h
 GPUCache
 /*.liuguang
+template.uvoptx
+*.uvguix.*
+DebugConfig
