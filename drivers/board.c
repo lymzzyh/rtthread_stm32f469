@@ -139,8 +139,11 @@ void HAL_MspInit(void)
 /**
  * This function will initial STM32 board.
  */
+#if defined(BSP_USING_HEAP_SRAM_SDRAM)
 static struct rt_memheap system_heap;
-void rt_hw_board_init()
+#endif
+
+void rt_hw_board_init(void)
 {
     /* Configure the system clock @ 84 Mhz */
     SystemClock_Config();
@@ -154,9 +157,15 @@ void rt_hw_board_init()
 #endif
 
 #ifdef RT_USING_HEAP
-    // rt_system_heap_init((void *)SDRAM_BEGIN, (void *)SDRAM_END);
-    // rt_memheap_init(&system_heap, "sram", (void *)HEAP_BEGIN, HEAP_SIZE);
-
+    
+#if defined(BSP_USING_HEAP_SRAM)
     rt_system_heap_init((void *)HEAP_BEGIN, (void *)HEAP_END);
+#endif
+    
+#if defined(BSP_USING_HEAP_SRAM_SDRAM)
+    rt_system_heap_init((void *)SDRAM_BEGIN, (void *)SDRAM_END);
+    rt_memheap_init(&system_heap, "sram", (void *)HEAP_BEGIN, HEAP_SIZE);
+#endif
+
 #endif
 }

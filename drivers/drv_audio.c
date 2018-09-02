@@ -97,7 +97,7 @@ static rt_uint8_t cs43l22_read_chip_revision(void)
     return revision; 
 }
 
-static rt_err_t cs43l22_play(rt_uint16_t* buffer, rt_uint16_t size)
+RT_USED static rt_err_t cs43l22_play(rt_uint16_t* buffer, rt_uint16_t size)
 {
     if(cs43l22_is_play == RT_TRUE)
     {
@@ -114,7 +114,7 @@ static rt_err_t cs43l22_play(rt_uint16_t* buffer, rt_uint16_t size)
     return RT_EOK; 
 }
 
-static rt_err_t cs43l22_stop(void)
+RT_USED static rt_err_t cs43l22_stop(void)
 {
     if(cs43l22_is_play == RT_FALSE)
     {
@@ -131,7 +131,7 @@ static rt_err_t cs43l22_stop(void)
     return RT_EOK; 
 }
 
-static rt_err_t cs43l22_pause(void)
+RT_USED static rt_err_t cs43l22_pause(void)
 {
     RT_ASSERT(cs43l22_set_mute(RT_TRUE) == RT_EOK); 
     RT_ASSERT(cs43l22_reg_write(CS43L22_REG_POWER_CTL1, 0x01) == RT_EOK);
@@ -139,7 +139,7 @@ static rt_err_t cs43l22_pause(void)
     return RT_EOK; 
 }
 
-static rt_err_t cs43l22_resume(void)
+RT_USED static rt_err_t cs43l22_resume(void)
 {
     rt_uint8_t index = 0; 
     
@@ -152,7 +152,7 @@ static rt_err_t cs43l22_resume(void)
     return RT_EOK; 
 }
 
-static rt_err_t cs43l22_set_freq(rt_uint8_t freq)
+RT_USED static rt_err_t cs43l22_set_freq(rt_uint8_t freq)
 {
     return RT_EOK; 
 }
@@ -253,7 +253,7 @@ static rt_err_t cs43l22_init(const char *i2c_bus_name)
     i2c_bus = rt_i2c_bus_device_find(i2c_bus_name); 
     if (i2c_bus == RT_NULL)
     {
-        rt_kprintf("can't find %s device", i2c_bus_name); 
+        rt_kprintf("can't find %s device\n", i2c_bus_name); 
         return RT_ERROR; 
     }
     

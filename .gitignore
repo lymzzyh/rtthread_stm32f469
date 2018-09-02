@@ -28,4 +28,7 @@ GPUCache
 /*.liuguang
 template.uvoptx
 *.uvguix.*
-DebugConfig
+DebugConfig/
+/*.uvoptx
+/JLinkLog.txt
+/JLinkSettings.ini

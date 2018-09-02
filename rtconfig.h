@@ -29,6 +29,7 @@
 
 /* Memory Management */
 
+#define RT_USING_MEMPOOL
 #define RT_USING_MEMHEAP
 #define RT_USING_MEMHEAP_AS_HEAP
 #define RT_USING_HEAP
@@ -37,8 +38,11 @@
 
 #define RT_USING_DEVICE
 #define RT_USING_CONSOLE
-#define RT_CONSOLEBUF_SIZE 1024
+#define RT_CONSOLEBUF_SIZE 128
 #define RT_CONSOLE_DEVICE_NAME "uart3"
+#define ARCH_ARM
+#define ARCH_ARM_CORTEX_M
+#define ARCH_ARM_CORTEX_M4
 
 /* RT-Thread Components */
 
@@ -55,16 +59,16 @@
 #define RT_USING_FINSH
 #define FINSH_THREAD_NAME "tshell"
 #define FINSH_USING_HISTORY
-#define FINSH_HISTORY_LINES 5
+#define FINSH_HISTORY_LINES 10
 #define FINSH_USING_SYMTAB
 #define FINSH_USING_DESCRIPTION
 #define FINSH_THREAD_PRIORITY 20
 #define FINSH_THREAD_STACK_SIZE 4096
-#define FINSH_CMD_SIZE 80
+#define FINSH_CMD_SIZE 256
 #define FINSH_USING_MSH
 #define FINSH_USING_MSH_DEFAULT
 #define FINSH_USING_MSH_ONLY
-#define FINSH_ARG_MAX 10
+#define FINSH_ARG_MAX 16
 
 /* Device virtual file system */
 
@@ -72,7 +76,7 @@
 #define DFS_USING_WORKDIR
 #define DFS_FILESYSTEMS_MAX 4
 #define DFS_FILESYSTEM_TYPES_MAX 4
-#define DFS_FD_MAX 4
+#define DFS_FD_MAX 16
 #define RT_USING_DFS_ELMFAT
 
 /* elm-chan's FatFs, Generic FAT Filesystem Module */
@@ -97,17 +101,12 @@
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
 #define RT_USING_SPI
-#define RT_USING_SFUD
-#define RT_SFUD_USING_SFDP
-#define RT_SFUD_USING_FLASH_INFO_TABLE
-#define RT_DEBUG_SFUD
 
 /* Using USB */
 
 
 /* POSIX layer and C standard library */
 
-#define RT_USING_LIBC
 
 /* Network */
 
@@ -127,6 +126,9 @@
 
 
 /* Utilities */
+
+
+/* ARM CMSIS */
 
 
 /* RT-Thread online packages */
@@ -168,31 +170,45 @@
 
 /* sample package */
 
-/* samples: kernel and components samples */
-
 
 /* example package: hello */
 
-
-/* Privated Packages of RealThread */
-
-
-/* Network Utilities */
-
-
-/* RT-Thread Senior Membership Packages */
-
-/* system packages */
-
-
-/* IoT - internet of things */
-
-/* Webnet: A web server package for rt-thread */
-
 #define SOC_STM32F469NI
-#define RT_HSE_VALUE 8000000
-#define RT_HSE_HCLK 180000000
-#define RT_USING_UART3
-#define RT_USING_SPI1
+
+/* STM32 Bsp Config */
+
+#define BSP_USING_HEAP_SRAM_SDRAM
+
+/* Select uart drivers */
+
+#define BSP_USING_UART3
+
+/* Select pin drivers */
+
+#define BSP_USING_PIN
+
+/* Select i2c bus drivers */
+
+#define BSP_USING_I2C2
+
+/* Select spi bus drivers */
+
+
+/* Select sdram drivers */
+
+#define BSP_USING_SDRAM
+
+/* Select audio drivers */
+
+#define BSP_USING_AUDIO
+
+/* Select sdcard drivers */
+
+#define BSP_USING_SDCARD
+#define BSP_USING_SDCARD_MOUNT
+
+/* Select lcd drivers */
+
+#define BSP_USING_LCD
 
 #endif

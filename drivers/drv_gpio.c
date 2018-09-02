@@ -14,7 +14,7 @@
 #include <rthw.h>
 #include <rtdevice.h>
 #include <board.h>
-#ifdef RT_USING_PIN
+
 #define __STM32_PIN(index, gpio, gpio_index) {index, GPIO##gpio##_CLK_ENABLE, GPIO##gpio, GPIO_PIN_##gpio_index}
 #define __STM32_PIN_DEFAULT {-1, 0, 0, 0}
 
@@ -1869,4 +1869,3 @@ void EXTI15_10_IRQHandler(void)
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
     rt_interrupt_leave();
 }
-#endif
