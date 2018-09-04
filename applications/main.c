@@ -26,6 +26,9 @@ int main(void)
         rt_kprintf("sdcard mount '%s' failed.\n", "/mnt/sd"); 
         return RT_ERROR; 
     }
+    
+    extern int chdir(const char *path); 
+    chdir("/mnt/sd"); 
 #endif
     
     rt_kprintf("[STM32] Welcome to use STM32F469-Discovery.\n"); 

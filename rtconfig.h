@@ -167,8 +167,12 @@
 
 /* miscellaneous packages */
 
+#define PKG_USING_OPTPARSE
+#define PKG_USING_OPTPARSE_V100
 
 /* sample package */
+
+/* samples: kernel and components samples */
 
 
 /* example package: hello */
@@ -210,5 +214,7 @@
 /* Select lcd drivers */
 
 #define BSP_USING_LCD
+
+#define PKG_USING_LINMATH
 
 #endif
