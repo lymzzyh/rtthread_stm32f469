@@ -63,7 +63,6 @@ extern "C" {
 /* #define HAL_PCCARD_MODULE_ENABLED    */
 /* #define HAL_SRAM_MODULE_ENABLED      */
 /* #define HAL_HASH_MODULE_ENABLED      */
-/* #define HAL_I2C_MODULE_ENABLED       */
 /* #define HAL_RNG_MODULE_ENABLED       */
 /* #define HAL_IRDA_MODULE_ENABLED      */
 /* #define HAL_SMARTCARD_MODULE_ENABLED */
@@ -88,6 +87,7 @@ extern "C" {
 #define HAL_USART_MODULE_ENABLED
 #define HAL_CORTEX_MODULE_ENABLED
 #define HAL_SAI_MODULE_ENABLED
+#define HAL_I2C_MODULE_ENABLED
 
 #ifdef RT_USING_RTC
 #define HAL_RTC_MODULE_ENABLED
