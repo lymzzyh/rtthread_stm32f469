@@ -216,5 +216,7 @@
 #define BSP_USING_LCD
 
 #define PKG_USING_LINMATH
+#define PKG_USING_LIBTEST
+#define LIBTEST_USING_USAGE_VIEW_HEAD
 
 #endif

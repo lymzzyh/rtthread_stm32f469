@@ -14,8 +14,7 @@
 #include <rtthread.h>
 #include <board.h>
 
-#include "stm32469i_discovery.h"
-#include "stm32469i_discovery_audio.h"
+#include "drv_codec.h"
 
 #if defined(BSP_USING_SDCARD_MOUNT)
 #include <dfs_file.h>
@@ -32,6 +31,7 @@ typedef enum
 } BUFFER_StateTypeDef;
 
 #define AUDIO_BUFFER_SIZE 8192
+#define WAV_FILE_NAME     "./3.wav"
 
 struct rt_audio
 {
@@ -59,12 +59,12 @@ int main(void)
     {
         int fd = -1; 
         
-        if(BSP_AUDIO_OUT_Init(OUTPUT_DEVICE_AUTO, 75, I2S_AUDIOFREQ_22K) != 0)
+        if(BSP_AUDIO_OUT_Init(OUTPUT_DEVICE_AUTO, 70, I2S_AUDIOFREQ_22K) != 0)
         {
             rt_kprintf("BSP_AUDIO_OUT_Init failed.\n"); 
         }
         
-        fd = open("./1.wav", O_RDONLY); 
+        fd = open(WAV_FILE_NAME, O_RDONLY); 
         if(fd < 0)
         {
             rt_kprintf("1.wav open failed fd = %d.\n", fd); 
@@ -73,8 +73,8 @@ int main(void)
         
         // get file size
         struct stat buf; 
-        stat("./1.wav", &buf);
-        rt_kprintf("1.wav file size = %d bytes\n", buf.st_size); 
+        stat(WAV_FILE_NAME, &buf);
+        rt_kprintf("%s file size = %d bytes\n", WAV_FILE_NAME, buf.st_size); 
         
         //haudio = rt_malloc(sizeof(struct rt_audio)); 
         haudio = rt_malloc_align(sizeof(struct rt_audio), 4); 
@@ -92,6 +92,8 @@ int main(void)
         }
         
         memset(haudio, 0x00, sizeof(struct rt_audio)); 
+        
+        rt_kprintf("Start Play %s.\n", WAV_FILE_NAME); 
         
         while(1)
         {
@@ -134,11 +136,6 @@ void BSP_AUDIO_OUT_TransferComplete_CallBack(void)
     haudio->state = BUFFER_OFFSET_FULL;
 }
 
-/**
-  * @brief  Manages the DMA Half Transfer complete interrupt.
-  * @param  None
-  * @retval None
-  */
 void BSP_AUDIO_OUT_HalfTransfer_CallBack(void)
 { 
     haudio->state = BUFFER_OFFSET_HALF;
