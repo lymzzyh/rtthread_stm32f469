@@ -271,10 +271,10 @@ rt_err_t otm8009a_init(void)
     uint32_t HSA = LCD_HSYNC, HFP = LCD_HFP, HBP = LCD_HBP, HACT = LCD_WIDTH;
     uint32_t VSA = LCD_VSYNC, VFP = LCD_VFP, VBP = LCD_VBP, VACT = LCD_HEIGHT;
     
-    /* ¸´Î»OTM8009AÏÔÊ¾ÆÁ */ 
+    /* ï¿½ï¿½Î»OTM8009Aï¿½ï¿½Ê¾ï¿½ï¿½ */ 
     otm8009a_reset(); 
     
-    /* ³õÊ¼»¯STM32ÏÔÊ¾ÆÁÊ±ÖÓ */ 
+    /* ï¿½ï¿½Ê¼ï¿½ï¿½STM32ï¿½ï¿½Ê¾ï¿½ï¿½Ê±ï¿½ï¿½ */ 
     __HAL_RCC_LTDC_CLK_ENABLE();
     __HAL_RCC_LTDC_FORCE_RESET();
     __HAL_RCC_LTDC_RELEASE_RESET();
@@ -295,7 +295,7 @@ rt_err_t otm8009a_init(void)
     PeriphClkInitStruct.PLLSAIDivR           = RCC_PLLSAIDIVR_2;
     HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
     
-    /* ÅäÖÃNVIC */ 
+    /* ï¿½ï¿½ï¿½ï¿½NVIC */ 
     HAL_NVIC_SetPriority(LTDC_IRQn,  3, 0);
     HAL_NVIC_SetPriority(DMA2D_IRQn, 3, 0);
     HAL_NVIC_SetPriority(DSI_IRQn,   3, 0);
@@ -304,7 +304,7 @@ rt_err_t otm8009a_init(void)
     HAL_NVIC_EnableIRQ(DMA2D_IRQn);
     HAL_NVIC_EnableIRQ(DSI_IRQn);
     
-    /* ÅäÖÃDSI */ 
+    /* ï¿½ï¿½ï¿½ï¿½DSI */ 
     DSI_PLLInitTypeDef dsi_pll;
     
     lcd.dsi.Instance = DSI; 
@@ -318,7 +318,7 @@ rt_err_t otm8009a_init(void)
     HAL_DSI_DeInit(&(lcd.dsi)); 
     HAL_DSI_Init(&(lcd.dsi), &(dsi_pll)); 
     
-    /* ÅäÖÃDSI Video */ 
+    /* ï¿½ï¿½ï¿½ï¿½DSI Video */ 
     lcd.dsi_video.VirtualChannelID             = 0;
     lcd.dsi_video.ColorCoding                  = DSI_RGB888;
     lcd.dsi_video.VSPolarity                   = DSI_VSYNC_ACTIVE_HIGH;
@@ -346,7 +346,7 @@ rt_err_t otm8009a_init(void)
     lcd.dsi_video.LPVerticalSyncActiveEnable   = DSI_LP_VSYNC_ENABLE; 
     HAL_DSI_ConfigVideoMode(&(lcd.dsi), &(lcd.dsi_video)); 
     
-    /* ÅäÖÃDSI PHY */ 
+    /* ï¿½ï¿½ï¿½ï¿½DSI PHY */ 
     DSI_PHY_TimerTypeDef dsi_phy;
     
     dsi_phy.ClockLaneHS2LPTime  = 35;
@@ -357,7 +357,7 @@ rt_err_t otm8009a_init(void)
     dsi_phy.StopWaitTime        = 10;
     HAL_DSI_ConfigPhyTimer(&(lcd.dsi), &dsi_phy); 
     
-    /* ÅäÖÃLTDC */ 
+    /* ï¿½ï¿½ï¿½ï¿½LTDC */ 
     lcd.ltdc.Instance = LTDC;
     
     lcd.ltdc.Init.PCPolarity         = LTDC_PCPOLARITY_IPC;
@@ -421,7 +421,7 @@ void LTDC_IRQHandler(void)
     rt_interrupt_leave();
 }
 
-/* ²âÊÔ´úÂë: ---------------------------------------- */ 
+/* ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½: ---------------------------------------- */ 
 static void lcd_fill_buffer(void *addr, uint32_t x_size, uint32_t y_size, uint32_t offset, uint32_t color)
 {
     lcd.dma2d.Instance = DMA2D;
@@ -454,7 +454,7 @@ void lcd_fill_rect(uint16_t x_pos, uint16_t y_pos, uint16_t width, uint16_t heig
     lcd_fill_buffer((uint32_t *)Xaddress, width, height, (LCD_WIDTH - width), 0xFF00FF00);
 }
 
-/* ²âÊÔ´úÂë ----------------------------------------- */
+/* ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ ----------------------------------------- */
 
 static rt_err_t stm32_lcd_init(rt_device_t device)
 {
@@ -520,4 +520,4 @@ int rt_hw_lcd_init(void)
 
     return ret;
 }
-INIT_DEVICE_EXPORT(rt_hw_lcd_init);
+INIT_DEVICE_EXPORT(rt_hw_lcd_init); 

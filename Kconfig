@@ -123,4 +123,12 @@ menu "Select lcd drivers"
         select BSP_USING_SDRAM
 endmenu
 
+config PKG_USING_OPTPARSE
+    bool "Select optparse pkg" 
+    default y 
+
+config PKG_USING_LIBTEST
+    bool "Select libtest pkg" 
+    default y 
+
 endmenu 

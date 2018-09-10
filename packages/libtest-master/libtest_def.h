@@ -16,7 +16,7 @@
 
 #include "rtthread.h"
 
-#define DBG_SECTION_NAME "[LIBTEST] "
+#define DBG_SECTION_NAME "LIBTEST"
 #define DBG_ENABLE          
 #define DBG_COLOR           
 #define DBG_LEVEL        DBG_INFO

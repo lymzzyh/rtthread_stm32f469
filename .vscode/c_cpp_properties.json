@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "intelliSenseMode": "clang-x64",
+            "name": "Win32",
+            "cppStandard": "c++11",
+            "cStandard": "c99",
+            "compilerPath": "D:/software/env/tools/gnu_gcc/arm_gcc/mingw/bin/arm-none-eabi-gcc",
+            "includePath": [
+                "G:/embedded/GitHub/rtthread_stm32f469",
+                "G:/embedded/GitHub/rtthread_stm32f469/Libraries/CMSIS/Device/ST/STM32F4xx/Include",
+                "G:/embedded/GitHub/rtthread_stm32f469/Libraries/CMSIS/Include",
+                "G:/embedded/GitHub/rtthread_stm32f469/Libraries/STM32F4xx_HAL_Driver/Inc",
+                "G:/embedded/GitHub/rtthread_stm32f469/applications",
+                "G:/embedded/GitHub/rtthread_stm32f469/drivers",
+                "G:/embedded/GitHub/rtthread_stm32f469/drivers/audio",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/components/dfs/filesystems/devfs",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/components/dfs/filesystems/elmfat",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/components/dfs/filesystems/romfs",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/components/dfs/include",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/components/drivers/audio",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/components/drivers/include",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/components/drivers/spi",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/components/finsh",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/components/libc/compilers/minilibc",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/include",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/libcpu/arm/common",
+                "G:/embedded/GitHub/rtthread_stm32f469/rt-thread/libcpu/arm/cortex-m4"
+            ],
+            "defines": [
+                "HAVE_CCONFIG_H",
+                "RT_USING_MINILIBC",
+                "STM32F469xx",
+                "USE_HAL_DRIVER"
+            ]
+        }
+    ],
+    "version": 4
+}

@@ -101,6 +101,7 @@
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
 #define RT_USING_SPI
+#define RT_USING_AUDIO
 
 /* Using USB */
 
@@ -172,8 +173,6 @@
 
 /* sample package */
 
-/* samples: kernel and components samples */
-
 
 /* example package: hello */
 
@@ -214,9 +213,6 @@
 /* Select lcd drivers */
 
 #define BSP_USING_LCD
-
-#define PKG_USING_LINMATH
 #define PKG_USING_LIBTEST
-#define LIBTEST_USING_USAGE_VIEW_HEAD
 
 #endif
