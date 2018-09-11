@@ -31,5 +31,17 @@ enum output_mode
 
 /* API */ 
 rt_err_t cs43l22_init(const char *i2c_name, rt_int8_t pin, rt_uint8_t addr, rt_uint8_t output, rt_uint8_t volume); 
+rt_uint8_t cs43l22_chip_id(void); 
+rt_uint8_t cs43l22_chip_revision(void); 
+rt_err_t cs43l22_set_volume(rt_uint8_t volume); 
+rt_err_t cs43l22_set_mute(rt_bool_t enable); 
+rt_err_t cs43l22_set_output(rt_uint8_t mode); 
+rt_err_t cs43l22_reset(void); 
+rt_err_t cs43l22_play(void); 
+rt_err_t cs43l22_stop(void); 
+rt_err_t cs43l22_pause(void); 
+rt_err_t cs43l22_resume(void); 
+
+void reg_dump(void); 
 
 #endif

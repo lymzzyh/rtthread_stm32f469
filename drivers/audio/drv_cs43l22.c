@@ -54,7 +54,7 @@ rt_uint8_t reg_read(rt_uint8_t reg)
     msg[0].addr  = cs43l22.addr; 
     msg[0].flags = RT_I2C_WR;
     msg[0].len   = 1;
-    msg[0].buf   = &cs43l22.addr;
+    msg[0].buf   = &reg;
 
     msg[1].addr  = cs43l22.addr; 
     msg[1].flags = RT_I2C_RD;
@@ -66,9 +66,6 @@ rt_uint8_t reg_read(rt_uint8_t reg)
         rt_kprintf("I2C write data failed.\n");
         return 0xff;
     }
-
-    // Debug 
-    rt_kprintf("REG READ(%.2x: %.2x)\n", reg, val); 
 
     return val;
 }
@@ -98,7 +95,7 @@ static void reg_write(rt_uint8_t reg, rt_uint8_t val)
     rt_kprintf("REG WRITE(%.2x: %.2x)\n", reg, val); 
 }
 
-static void reg_dump(void)
+void reg_dump(void)
 {
     rt_uint8_t reg = 0; 
     
@@ -200,6 +197,12 @@ rt_err_t cs43l22_set_output(rt_uint8_t mode)
     return ret; 
 }
 
+/**
+ * Hardware reset for cs43l22
+ * 
+ * @return  RT_EOK:    Reset successfully
+ *         -RT_ENOSYS: Not find cs43l22 reset pin 
+ */
 rt_err_t cs43l22_reset(void)
 {
     rt_err_t ret = RT_EOK; 
@@ -219,6 +222,12 @@ __exit:
     return ret; 
 }
 
+/**
+ * Play the cs43l22 into play states
+ * 
+ * @return  RT_EOK:    Success Play
+ *         -RT_ENOSYS: cs43l22 is uninitialized
+ */
 rt_err_t cs43l22_play(void)
 {
     rt_err_t ret = RT_EOK; 
@@ -238,6 +247,12 @@ __exit:
     return ret; 
 } 
 
+/**
+ * Stop the cs43l22 into stop states
+ * 
+ * @return  RT_EOK:    Success Stop
+ *         -RT_ENOSYS: cs43l22 is uninitialized
+ */
 rt_err_t cs43l22_stop(void)
 {
     rt_err_t ret = RT_EOK; 
@@ -257,6 +272,12 @@ __exit:
     return ret; 
 } 
 
+/**
+ * Pause the cs43l22 into stop states
+ * 
+ * @return  RT_EOK:    Success pause
+ *         -RT_ENOSYS: cs43l22 is uninitialized
+ */
 rt_err_t cs43l22_pause(void)
 {
     rt_err_t ret = RT_EOK; 
@@ -275,6 +296,12 @@ __exit:
     return ret; 
 }
 
+/**
+ * Resume the cs43l22 into play states
+ * 
+ * @return  RT_EOK:    Success resume
+ *         -RT_ENOSYS: cs43l22 is uninitialized
+ */
 rt_err_t cs43l22_resume(void)
 {
     rt_err_t ret = RT_EOK; 
