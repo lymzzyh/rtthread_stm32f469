@@ -28,8 +28,11 @@
 #endif
 
 static SD_HandleTypeDef hsdcard; 
+
+#if RT_SDCARD_DMA_MODE
 static DMA_HandleTypeDef hdma_rx; 
 static DMA_HandleTypeDef hdma_tx; 
+#endif
 
 rt_err_t sdcard_init(void)
 {

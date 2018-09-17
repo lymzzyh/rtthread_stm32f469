@@ -324,10 +324,6 @@ HAL_StatusTypeDef HAL_I2S_Init(I2S_HandleTypeDef *hi2s)
   /* Test if the divider is 1 or 0 or greater than 0xFF */
   if((i2sdiv < 2U) || (i2sdiv > 0xFFU))
   {
-    /* Set the default values */
-    i2sdiv = 2U;
-    i2sodd = 0U;
-
     /* Set the error code and execute error callback*/
     SET_BIT(hi2s->ErrorCode, HAL_I2S_ERROR_PRESCALER);
     HAL_I2S_ErrorCallback(hi2s);
