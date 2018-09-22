@@ -100,6 +100,7 @@ menu "Select audio drivers"
         default n 
 endmenu
 
+if !PKG_USING_STM32_SDIO
 menu "Select sdcard drivers"
     config BSP_USING_SDCARD
         bool "Using sdcard(block device)" 
@@ -115,6 +116,7 @@ menu "Select sdcard drivers"
         default "/mnt/sd" 
         depends on BSP_USING_SDCARD 
 endmenu
+endif
 
 menu "Select lcd drivers"
     config BSP_USING_LCD

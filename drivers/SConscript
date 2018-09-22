@@ -11,7 +11,7 @@ inc = []
 
 # add dwin basic include
 inc = inc + [cwd]
-inc = inc + [cwd + "/audio"]
+
 
 # add dwin basic code
 src += ['board.c']
@@ -39,6 +39,13 @@ if GetDepend(['BSP_USING_LCD']):
 
 if GetDepend(['BSP_USING_AUDIO']):
     src += Glob('./audio/*.c')
+    inc += [cwd + "/audio"]
+
+if GetDepend(['PKG_USING_STM32_SDIO']):
+    src += ['drv_sdio_adapter.c']
+
+if GetDepend(['RT_USING_USB_DEVICE']):
+    src += ['drv_usbd.c']
 
 group = DefineGroup('Drivers', src, depend = [''], CPPPATH = inc)
 
