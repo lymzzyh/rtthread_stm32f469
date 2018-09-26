@@ -59,14 +59,9 @@ int main(void)
     chdir(BSP_USING_SDCARD_PATH_MOUNT); 
 #endif
     
-#if defined(PKG_USING_PLAYER)
-    extern int msh_exec(char *cmd, rt_size_t length); 
-    
-    #define _cmd1 "player -v 65" 
-    msh_exec(_cmd1, rt_strlen(_cmd1)); 
-    
-    #define _cmd2 "listplayer --play" 
-    msh_exec(_cmd2, rt_strlen(_cmd2)); 
+#ifdef RT_USING_SPI_WIFI
+    wifi_spi_device_init("wspi");
+    rt_hw_wifi_init("wspi",MODE_STATION);
 #endif
 }
 

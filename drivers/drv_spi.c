@@ -293,14 +293,11 @@ rt_err_t stm32_spi_bus_attach_device(rt_uint32_t pin, const char *bus_name, cons
 int stm32_hw_spi_init(void)
 {
     int result = 0;
-#ifdef RT_USING_SPI1
+#ifdef BSP_USING_SPI1
     result = stm32_spi_register_bus(SPI1, "spi1");
 #endif
-#ifdef RT_USING_SPI2
+#ifdef BSP_USING_SPI2
     result = stm32_spi_register_bus(SPI2, "spi2");
-#endif
-#ifdef RT_USING_SPI3
-    result = stm32_spi_register_bus(SPI3, "spi3");
 #endif
     return result;
 }
@@ -314,51 +311,45 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *spiHandle)
         /* SPI1 clock enable */
         __HAL_RCC_SPI1_CLK_ENABLE();
         __HAL_RCC_GPIOA_CLK_ENABLE();
+        __HAL_RCC_GPIOB_CLK_ENABLE();
         /**SPI1 GPIO Configuration
         PA5     ------> SPI1_SCK
-        PA6     ------> SPI1_MISO
-        PA7     ------> SPI1_MOSI
+        PB4     ------> SPI1_MISO
+        PB5     ------> SPI1_MOSI
         */
-        GPIO_InitStruct.Pin = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
         GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+        
+        GPIO_InitStruct.Pin = GPIO_PIN_5;
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+        
+        GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_5;
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
     }
     else if (spiHandle->Instance == SPI2)
     {
         /* SPI2 clock enable */
         __HAL_RCC_SPI2_CLK_ENABLE();
         __HAL_RCC_GPIOB_CLK_ENABLE();
+        __HAL_RCC_GPIOD_CLK_ENABLE();
         /**SPI2 GPIO Configuration
-        PB13     ------> SPI2_SCK
+        PD3      ------> SPI2_SCK
         PB14     ------> SPI2_MISO
         PB15     ------> SPI2_MOSI
         */
-        GPIO_InitStruct.Pin = GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
         GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
+        
+        GPIO_InitStruct.Pin = GPIO_PIN_14 | GPIO_PIN_15;
         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-    }
-    else if (spiHandle->Instance == SPI3)
-    {
-        /* SPI3 clock enable */
-        __HAL_RCC_SPI3_CLK_ENABLE();
-        __HAL_RCC_GPIOC_CLK_ENABLE();
-        /**SPI3 GPIO Configuration
-        PC10     ------> SPI3_SCK
-        PC11     ------> SPI3_MISO
-        PC12     ------> SPI3_MOSI
-        */
-        GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
-        HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+        
+        GPIO_InitStruct.Pin = GPIO_PIN_3;
+        HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+        
     }
 }
 
@@ -370,32 +361,23 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef *spiHandle)
         __HAL_RCC_SPI1_CLK_DISABLE();
         /**SPI1 GPIO Configuration
         PA5     ------> SPI1_SCK
-        PA6     ------> SPI1_MISO
-        PA7     ------> SPI1_MOSI
+        PB4     ------> SPI1_MISO
+        PB5     ------> SPI1_MOSI
         */
-        HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7);
+        HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5);
+        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_4 | GPIO_PIN_5);
     }
     else if (spiHandle->Instance == SPI2)
     {
         /* Peripheral clock disable */
         __HAL_RCC_SPI2_CLK_DISABLE();
         /**SPI2 GPIO Configuration
-        PB13     ------> SPI2_SCK
+        PD3      ------> SPI2_SCK
         PB14     ------> SPI2_MISO
         PB15     ------> SPI2_MOSI
         */
-        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15);
-    }
-    else if (spiHandle->Instance == SPI3)
-    {
-        /* Peripheral clock disable */
-        __HAL_RCC_SPI3_CLK_DISABLE();
-        /**SPI3 GPIO Configuration
-        PC10     ------> SPI3_SCK
-        PC11     ------> SPI3_MISO
-        PC12     ------> SPI3_MOSI
-        */
-        HAL_GPIO_DeInit(GPIOC, GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12);
+        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_14 | GPIO_PIN_15);
+        HAL_GPIO_DeInit(GPIOD, GPIO_PIN_3);
     }
 }
 #endif /*RT_USING_SPI*/
