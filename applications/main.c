@@ -53,7 +53,4 @@ int main(void)
     extern int chdir(const char *path); 
     chdir("/mnt/sd"); 
 #endif
-#ifdef BSP_USING_AUDIO
-    cs43l22_init("i2c2", 1, 0x94>>1, cs43l22_output_headphone, 100); 
-#endif
 }

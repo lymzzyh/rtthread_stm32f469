@@ -38,6 +38,6 @@ int libtest_init(void)
 
     return RT_EOK; 
 }
-INIT_APP_EXPORT(libtest_init); 
+//INIT_APP_EXPORT(libtest_init); 
 
 // 开机自定义测试指令. 
