@@ -8,7 +8,7 @@
 
 #include "audio_device.h"
 
-#define BUFSZ   1024*4
+#define BUFSZ   1024*16
 
 struct RIFF_HEADER_DEF
 {

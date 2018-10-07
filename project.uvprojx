@@ -332,7 +332,7 @@
               <MiscControls />
               <Define>USE_HAL_DRIVER, STM32F469xx, RT_USING_ARM_LIBC</Define>
               <Undefine />
-              <IncludePath>applications;.;drivers;drivers\audio;Libraries\CMSIS\Device\ST\STM32F4xx\Include;Libraries\CMSIS\Include;Libraries\STM32F4xx_HAL_Driver\Inc;packages\libtest-master;packages\libtest-master\libtest;packages\libtest-master\libtest\utils;packages\libtest-master\libtest\testcases;rt-thread\include;rt-thread\libcpu\arm\cortex-m4;rt-thread\libcpu\arm\common;rt-thread\components\dfs\include;rt-thread\components\dfs\filesystems\devfs;rt-thread\components\dfs\filesystems\elmfat;rt-thread\components\dfs\filesystems\romfs;rt-thread\components\drivers\include;rt-thread\components\drivers\include;rt-thread\components\drivers\include;rt-thread\components\drivers\spi;rt-thread\components\drivers\include;rt-thread\components\drivers\include;rt-thread\components\finsh;rt-thread\components\libc\compilers\armlibc</IncludePath>
+              <IncludePath>applications;.;drivers;drivers\audio;Libraries\CMSIS\Device\ST\STM32F4xx\Include;Libraries\CMSIS\Include;Libraries\STM32F4xx_HAL_Driver\Inc;packages\libtest-master;packages\libtest-master\libtest;packages\libtest-master\libtest\utils;packages\libtest-master\libtest\testcases;packages\optparse-v1.0.0;rt-thread\include;rt-thread\libcpu\arm\cortex-m4;rt-thread\libcpu\arm\common;rt-thread\components\dfs\include;rt-thread\components\dfs\filesystems\devfs;rt-thread\components\dfs\filesystems\elmfat;rt-thread\components\dfs\filesystems\romfs;rt-thread\components\drivers\include;rt-thread\components\drivers\include;rt-thread\components\drivers\include;rt-thread\components\drivers\spi;rt-thread\components\drivers\include;rt-thread\components\drivers\include;rt-thread\components\finsh;rt-thread\components\libc\compilers\armlibc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1113,6 +1113,16 @@
               <FileName>libtest_usage.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\libtest-master\libtest\utils\libtest_usage.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>optparse</GroupName>
+          <Files>
+            <File>
+              <FileName>optparse.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\optparse-v1.0.0\optparse.c</FilePath>
             </File>
           </Files>
         </Group>

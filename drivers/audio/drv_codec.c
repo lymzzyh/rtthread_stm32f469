@@ -193,7 +193,7 @@ struct audio_codec_device
     rt_uint32_t dma_irq_cnt;
 };
 
-#define AUDIO_SEND_BUFFER_SIZE 4096
+#define AUDIO_SEND_BUFFER_SIZE 2048
 #define codec_printf    rt_kprintf
 
 struct audio_codec_device _g_audio_codec;
@@ -392,11 +392,6 @@ static rt_err_t audio_codec_close(rt_device_t dev)
     
     rt_thread_mdelay(2);
     
-    if(HAL_SAI_DMAStop(&(sai.hsai)) != HAL_OK)
-    {
-        return (-RT_ERROR);
-    }
-    
     return RT_EOK; 
 }
 
@@ -525,7 +520,7 @@ int rt_audio_codec_hw_init(void)
     }
     memset(audio->send_fifo, 0, AUDIO_SEND_BUFFER_SIZE);
 
-    rt_data_node_init(&audio->node_list, 30);
+    rt_data_node_init(&audio->node_list, 100);
     audio->node_list->read_complete = data_node_read_complete;
     audio->node_list->user_data = audio;
 
@@ -545,12 +540,10 @@ int rt_audio_codec_hw_init(void)
     rt_device_register(&audio->parent, "sound", RT_DEVICE_FLAG_WRONLY | RT_DEVICE_FLAG_DMA_TX);
 
     cs43l22_init("i2c2", 1, 0x94>>1, cs43l22_output_headphone, 65); 
-    rt_kprintf("The CS43L22 Audio ID: %d.\n", cs43l22_chip_id());
     sai_init(AUDIO_FREQUENCY_022K);
     HAL_SAI_Transmit_DMA(&sai.hsai, (uint8_t *)(audio->send_fifo), AUDIO_SEND_BUFFER_SIZE/2); 
     
     rt_device_init(&audio->parent);
-    rt_kprintf("Audio init.\n");
 
     return RT_EOK;
 
