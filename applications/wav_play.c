@@ -8,7 +8,7 @@
 
 #include "audio_device.h"
 
-#define BUFSZ   2048
+#define BUFSZ   1024*4
 
 struct RIFF_HEADER_DEF
 {
@@ -76,7 +76,6 @@ void wavplay_thread_entry(void *parameter)
     audio_device_init();
     audio_device_open();
     audio_device_set_rate(info->fmt_block.wav_format.SamplesPerSec);
-    cs43l22_set_volume(75); 
     
     while (!feof(fp))
     {

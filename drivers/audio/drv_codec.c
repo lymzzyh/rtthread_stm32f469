@@ -157,14 +157,6 @@ void DMA2_Stream3_IRQHandler(void)
     HAL_DMA_IRQHandler(sai.hsai.hdmatx);
 } 
 
-/* SAI DMA 复位 */ 
-static void sai_dma_reset(void)
-{
-    
-}
-
-
-
 // --------------------------------------------------------------------------------------
 // Audio 
 // --------------------------------------------------------------------------------------
@@ -201,57 +193,10 @@ struct audio_codec_device
     rt_uint32_t dma_irq_cnt;
 };
 
-#define AUDIO_SEND_BUFFER_SIZE 2048
+#define AUDIO_SEND_BUFFER_SIZE 4096
 #define codec_printf    rt_kprintf
 
-enum CODEC_STATE
-{
-    DAC_DMA_IRQ_ENABLE = 0x01,
-    DAC_IRQ_ENABLE     = 0x04,
-};
-
-/* DMA 使能 */ 
-void sai_dma_init(struct audio_codec_device *audio)
-{
-//    /* DAM Config */ 
-//    sai.hdma.Instance                 = DMA2_Stream3;
-//    sai.hdma.Init.Channel             = DMA_CHANNEL_0;
-//    sai.hdma.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-//    sai.hdma.Init.PeriphInc           = DMA_PINC_DISABLE;
-//    sai.hdma.Init.MemInc              = DMA_MINC_ENABLE;
-//    sai.hdma.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-//    sai.hdma.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
-//    sai.hdma.Init.Mode                = DMA_CIRCULAR;
-//    sai.hdma.Init.Priority            = DMA_PRIORITY_HIGH;
-//    sai.hdma.Init.FIFOMode            = DMA_FIFOMODE_ENABLE;
-//    sai.hdma.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-//    sai.hdma.Init.MemBurst            = DMA_MBURST_SINGLE;
-//    sai.hdma.Init.PeriphBurst         = DMA_PBURST_SINGLE;
-
-//    __HAL_LINKDMA(&sai.hsai, hdmatx, sai.hdma); 
-//    HAL_DMA_DeInit(&sai.hdma);
-//    HAL_DMA_Init(&sai.hdma); 
-
-//    HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 5, 0);
-//    HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
-}
-
 struct audio_codec_device _g_audio_codec;
-
-/* SAI DMA 使能 */ 
-static void sai_dma_enable(rt_bool_t enable)
-{
-    if(enable == RT_TRUE)
-    {
-        
-    }
-    else
-    {
-        //HAL_SAI_DMAStop(); 
-    }
-}
-
-
 
 int rt_data_node_init(struct rt_data_node_list **node_list, rt_uint32_t size)
 {
@@ -430,11 +375,28 @@ static rt_err_t audio_codec_init(rt_device_t dev)
 
 static rt_err_t audio_codec_open(rt_device_t dev, rt_uint16_t oflag)
 {
+    if(cs43l22_play() != RT_EOK)
+    {  
+        return (-RT_ERROR);
+    }
+    
     return RT_EOK;
 }
 
 static rt_err_t audio_codec_close(rt_device_t dev)
 {
+    if(cs43l22_stop() != RT_EOK)
+    {  
+        return (-RT_ERROR);
+    }
+    
+    rt_thread_mdelay(2);
+    
+    if(HAL_SAI_DMAStop(&(sai.hsai)) != HAL_OK)
+    {
+        return (-RT_ERROR);
+    }
+    
     return RT_EOK; 
 }
 
@@ -452,12 +414,8 @@ static rt_size_t audio_codec_write(rt_device_t dev, rt_off_t pos,
 
 static rt_err_t audio_codec_control(rt_device_t dev, int cmd, void *args)
 {
-    rt_err_t result = RT_EOK, stat;
-    struct audio_codec_device *audio = RT_NULL;
-
-    audio = (struct audio_codec_device *)dev;
-    stat = audio->stat;
-
+    rt_err_t result = RT_EOK;
+    
     switch (cmd)
     {
     case CODEC_CMD_SET_VOLUME:
@@ -466,7 +424,7 @@ static rt_err_t audio_codec_control(rt_device_t dev, int cmd, void *args)
 
         rt_kprintf("set volume %d \n", volume);
 
-        //cs43l22_set_volume((rt_uint8_t)volume); 
+        cs43l22_set_volume((rt_uint8_t)volume); 
         break;
     }
 
@@ -509,13 +467,8 @@ void _dma_half_handler(void)
     result = rt_data_node_is_empty(audio->node_list);
     if (result)
     {
-        rt_kprintf("#");
-        if (print_cnt == 0)
-        {
-            // msh_exec("audio_dump", strlen("audio_dump"));
-            // msh_exec("stream_pipe_dump", strlen("stream_pipe_dump"));
-        }
-        print_cnt ++;
+        // rt_kprintf("#");
+        print_cnt++;
         memset(audio->send_fifo, 0, AUDIO_SEND_BUFFER_SIZE / 2);
     }
     else
@@ -532,11 +485,11 @@ void _dma_finish_handler(void)
     struct audio_codec_device *audio = RT_NULL;
 
     audio = &_g_audio_codec;
-    audio->dma_irq_cnt ++;
+    audio->dma_irq_cnt++;
     result = rt_data_node_is_empty(audio->node_list);
     if (result)
     {
-        rt_kprintf("*");
+        // rt_kprintf("*");
         memset(audio->send_fifo + (AUDIO_SEND_BUFFER_SIZE / 2), 0, AUDIO_SEND_BUFFER_SIZE / 2);
     }
     else
@@ -572,7 +525,7 @@ int rt_audio_codec_hw_init(void)
     }
     memset(audio->send_fifo, 0, AUDIO_SEND_BUFFER_SIZE);
 
-    rt_data_node_init(&audio->node_list, 10);
+    rt_data_node_init(&audio->node_list, 30);
     audio->node_list->read_complete = data_node_read_complete;
     audio->node_list->user_data = audio;
 
@@ -591,10 +544,12 @@ int rt_audio_codec_hw_init(void)
     /* register the device */
     rt_device_register(&audio->parent, "sound", RT_DEVICE_FLAG_WRONLY | RT_DEVICE_FLAG_DMA_TX);
 
-    cs43l22_init("i2c2", 1, 0x94>>1, cs43l22_output_headphone, 90); 
+    cs43l22_init("i2c2", 1, 0x94>>1, cs43l22_output_headphone, 65); 
+    rt_kprintf("The CS43L22 Audio ID: %d.\n", cs43l22_chip_id());
     sai_init(AUDIO_FREQUENCY_022K);
+    HAL_SAI_Transmit_DMA(&sai.hsai, (uint8_t *)(audio->send_fifo), AUDIO_SEND_BUFFER_SIZE/2); 
+    
     rt_device_init(&audio->parent);
-    HAL_SAI_Transmit_DMA(&sai.hsai, (uint8_t *)(audio->send_fifo), AUDIO_SEND_BUFFER_SIZE); 
     rt_kprintf("Audio init.\n");
 
     return RT_EOK;
