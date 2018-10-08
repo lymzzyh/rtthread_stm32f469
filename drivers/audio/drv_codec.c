@@ -385,12 +385,16 @@ static rt_err_t audio_codec_open(rt_device_t dev, rt_uint16_t oflag)
 
 static rt_err_t audio_codec_close(rt_device_t dev)
 {
+    struct audio_codec_device *audio = RT_NULL;
+    audio = (struct audio_codec_device *)dev;
+    
+    /* 没有这个切换歌曲的时候就会先放之前最后的数据才放下一首, 体验非常差 */ 
+    wait_node_free(audio->node_list);
+    
     if(cs43l22_stop() != RT_EOK)
     {  
         return (-RT_ERROR);
     }
-    
-    rt_thread_mdelay(2);
     
     return RT_EOK; 
 }
@@ -520,7 +524,7 @@ int rt_audio_codec_hw_init(void)
     }
     memset(audio->send_fifo, 0, AUDIO_SEND_BUFFER_SIZE);
 
-    rt_data_node_init(&audio->node_list, 100);
+    rt_data_node_init(&audio->node_list, 10);
     audio->node_list->read_complete = data_node_read_complete;
     audio->node_list->user_data = audio;
 
