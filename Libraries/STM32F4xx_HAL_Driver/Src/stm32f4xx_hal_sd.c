@@ -501,7 +501,7 @@ HAL_StatusTypeDef HAL_SD_ReadBlocks(SD_HandleTypeDef *hsd, uint8_t *pData, uint3
   uint32_t errorstate = HAL_SD_ERROR_NONE;
   uint32_t tickstart = HAL_GetTick();
   uint32_t count = 0U, *tempbuff = (uint32_t *)pData;
-  
+  uint32_t temp32 = 0;
   if(NULL == pData)
   {
     hsd->ErrorCode |= HAL_SD_ERROR_PARAM;
@@ -584,7 +584,8 @@ HAL_StatusTypeDef HAL_SD_ReadBlocks(SD_HandleTypeDef *hsd, uint8_t *pData, uint3
         /* Read data from SDIO Rx FIFO */
         for(count = 0U; count < 8U; count++)
         {
-          *(tempbuff + count) = SDIO_ReadFIFO(hsd->Instance);
+            temp32 = SDIO_ReadFIFO(hsd->Instance);
+            rt_memcpy(tempbuff + count, &temp32, 4);
         }
         tempbuff += 8U;
       }
@@ -646,7 +647,8 @@ HAL_StatusTypeDef HAL_SD_ReadBlocks(SD_HandleTypeDef *hsd, uint8_t *pData, uint3
     /* Empty FIFO if there is still any data */
     while ((__HAL_SD_GET_FLAG(hsd, SDIO_FLAG_RXDAVL)))
     {
-      *tempbuff = SDIO_ReadFIFO(hsd->Instance);
+      temp32 = SDIO_ReadFIFO(hsd->Instance);
+      rt_memcpy(tempbuff, &temp32, 4);
       tempbuff++;
       
       if((Timeout == 0U)||((HAL_GetTick()-tickstart) >=  Timeout))
