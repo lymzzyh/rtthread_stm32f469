@@ -12,7 +12,6 @@ inc = []
 # add dwin basic include
 inc = inc + [cwd]
 
-
 # add dwin basic code
 src += ['board.c']
 src += ['stm32f4xx_it.c']
@@ -31,18 +30,24 @@ if GetDepend(['BSP_USING_SPI']):
 if GetDepend(['BSP_USING_SDRAM']):
     src += ['drv_sdram.c']
 
-if GetDepend(['BSP_USING_SDCARD']):
+if GetDepend(['BSP_USING_SDCARD_BLOCK']):
     src += ['drv_sdcard.c']
+
+if GetDepend(['BSP_USING_SDCARD_SDIO_BUS']):
+    src += ['drv_sdio_adapter.c']
 
 if GetDepend(['BSP_USING_LCD']):
     src += ['drv_lcd.c']
 
 if GetDepend(['BSP_USING_AUDIO']):
     src += Glob('./audio/*.c')
-    inc += [cwd + "/audio"]
+    inc += [cwd + "/audio"] 
 
-if GetDepend(['PKG_USING_STM32_SDIO']):
-    src += ['drv_sdio_adapter.c']
+if GetDepend(['BSP_USING_RAMDISK']):
+    src += ['drv_ramdisk.c']
+
+if GetDepend(['RT_USING_USB_DEVICE']):
+    src += ['drv_usbd.c']
 
 if GetDepend(['RT_USING_USB_DEVICE']):
     src += ['drv_usbd.c']

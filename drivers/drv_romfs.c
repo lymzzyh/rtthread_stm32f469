@@ -92,6 +92,7 @@ static const rt_uint8_t _romfs_root_license[] =
 
 static const struct romfs_dirent _romfs_root_mmt[] = {
     {ROMFS_DIRENT_DIR, "sd", 0, 0}, 
+    {ROMFS_DIRENT_DIR, "tmp", 0, 0}, 
     {ROMFS_DIRENT_DIR, "flash", 0, 0}
 };
 

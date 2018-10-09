@@ -145,6 +145,10 @@ static struct rt_memheap system_heap;
 
 void rt_hw_board_init(void)
 {
+#if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
+    SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
+#endif
+
     /* Configure the system clock @ 84 Mhz */
     SystemClock_Config();
     HAL_Init();

@@ -100,6 +100,12 @@
 #define RT_USING_I2C
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
+#define RT_USING_SDIO
+#define RT_SDIO_STACK_SIZE 512
+#define RT_SDIO_THREAD_PRIORITY 15
+#define RT_MMCSD_STACK_SIZE 1024
+#define RT_MMCSD_THREAD_PREORITY 22
+#define RT_MMCSD_MAX_PARTITION 16
 #define RT_USING_SPI
 
 /* Using WiFi */
@@ -172,8 +178,6 @@
 
 /* miscellaneous packages */
 
-#define PKG_USING_OPTPARSE
-#define PKG_USING_OPTPARSE_V100
 
 /* sample package */
 
@@ -223,11 +227,19 @@
 /* Select sdcard drivers */
 
 #define BSP_USING_SDCARD
+#define BSP_USING_SDCARD_BLOCK
 #define BSP_USING_SDCARD_MOUNT
+#define BSP_USING_SDCARD_PATH_MOUNT "/mnt/sd"
 
 /* Select lcd drivers */
 
 #define BSP_USING_LCD
-#define PKG_USING_LIBTEST
+
+/* Select ramdisk drivers */
+
+#define BSP_USING_RAMDISK
+#define BSP_USING_RAMDISK_SIZE 4
+#define BSP_USING_RAMDISK_MOUNT
+#define BSP_USING_RAMDISK_PATH_MOUNT "/mnt/tmp"
 
 #endif

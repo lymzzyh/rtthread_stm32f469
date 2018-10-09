@@ -14,43 +14,48 @@
 #include <rtthread.h>
 #include <board.h>
 
-
-
 #if defined(RT_USING_DFS)
 #include <dfs_file.h>
 #include <dfs_posix.h>
 #endif
-#ifdef BSP_USING_AUDIO
-#include "drv_codec.h"
-#include "drv_cs43l22.h" 
-#endif
+
 int main(void)
 {   
-#if defined(RT_USING_DFS) && defined(RT_USING_SDIO)
+#if defined(BSP_USING_RAMDISK) && defined(BSP_USING_RAMDISK_MOUNT) 
+    dfs_mkfs("elm", "ram0"); 
+    
+    if(dfs_mount("ram0", BSP_USING_RAMDISK_PATH_MOUNT, "elm", 0, 0) != 0)
+    {
+        rt_kprintf("sdcard mount '%s' failed.\n", BSP_USING_RAMDISK_PATH_MOUNT); 
+        return RT_ERROR; 
+    }
+#endif
+    
+#if defined(BSP_USING_SDCARD_SDIO_BUS) && defined(BSP_USING_SDCARD_MOUNT)
     int result = mmcsd_wait_cd_changed(RT_TICK_PER_SECOND);
     if (result == MMCSD_HOST_PLUGED)
     {
         /* mount sd card fat partition 1 as root directory */
-        if (dfs_mount("sd0", "/mnt/sd", "elm", 0, 0) == 0)
+        if (dfs_mount("sd0", BSP_USING_SDCARD_PATH_MOUNT, "elm", 0, 0) == 0)
         {
-            rt_kprintf("sdcard mount '%s' failed.\n", "/mnt/sd"); 
+            rt_kprintf("sdcard mount '%s' failed.\n", BSP_USING_SDCARD_PATH_MOUNT); 
             return RT_ERROR; 
         }
         extern int chdir(const char *path); 
-        chdir("/mnt/sd");
+        chdir(BSP_USING_SDCARD_PATH_MOUNT);
     }
     else
     {
         rt_kprintf("sdcard not inserted!\n");
     }
-#elif defined(BSP_USING_SDCARD_MOUNT)
-    if(dfs_mount("sd0", "/mnt/sd", "elm", 0, 0) != 0)
+#elif defined(BSP_USING_SDCARD_BLOCK) && defined(BSP_USING_SDCARD_MOUNT)
+    if(dfs_mount("sd0", BSP_USING_SDCARD_PATH_MOUNT, "elm", 0, 0) != 0)
     {
-        rt_kprintf("sdcard mount '%s' failed.\n", "/mnt/sd"); 
+        rt_kprintf("sdcard mount '%s' failed.\n", BSP_USING_SDCARD_PATH_MOUNT); 
         return RT_ERROR; 
     }
     
     extern int chdir(const char *path); 
-    chdir("/mnt/sd"); 
+    chdir(BSP_USING_SDCARD_PATH_MOUNT); 
 #endif
 }

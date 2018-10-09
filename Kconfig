@@ -98,25 +98,38 @@ menu "Select audio drivers"
     config BSP_USING_AUDIO
         bool "Using audio" 
         default n 
+        select BSP_USING_I2C2
 endmenu
 
-if !PKG_USING_STM32_SDIO
 menu "Select sdcard drivers"
     config BSP_USING_SDCARD
-        bool "Using sdcard(block device)" 
+        bool "Using sdcard" 
         default y 
+        select RT_USING_DFS
+
+    choice
+        prompt "Drive type select"
+        default BSP_USING_SDCARD_BLOCK
+        depends on BSP_USING_SDCARD
+
+        config BSP_USING_SDCARD_BLOCK
+            bool "Block type" 
+        config BSP_USING_SDCARD_SDIO_BUS
+            bool "SDIO bus type"
+            select RT_USING_SDIO 
+            select PKG_USING_STM32_SDIO
+    endchoice
 
     config BSP_USING_SDCARD_MOUNT
         bool "Enable sdcard mount" 
         default y 
         depends on BSP_USING_SDCARD
     
-    config BSP_USING_SDCARD_PATH
+    config BSP_USING_SDCARD_PATH_MOUNT
         string "Path of sdcard mount"
         default "/mnt/sd" 
-        depends on BSP_USING_SDCARD 
+        depends on BSP_USING_SDCARD && BSP_USING_SDCARD_MOUNT
 endmenu
-endif
 
 menu "Select lcd drivers"
     config BSP_USING_LCD
@@ -125,12 +138,26 @@ menu "Select lcd drivers"
         select BSP_USING_SDRAM
 endmenu
 
-config PKG_USING_OPTPARSE
-    bool "Select optparse pkg" 
-    default y 
+menu "Select ramdisk drivers"
+    config BSP_USING_RAMDISK
+        bool "Using ramdisk" 
+        default y 
+        select BSP_USING_SDRAM
 
-config PKG_USING_LIBTEST
-    bool "Select libtest pkg" 
-    default y 
+    config BSP_USING_RAMDISK_SIZE
+        int "Ramdisk size(MB)" 
+        default 4  
+        depends on BSP_USING_RAMDISK 
+
+    config BSP_USING_RAMDISK_MOUNT
+        bool "Enable ramdisk mount" 
+        default y 
+        depends on BSP_USING_RAMDISK
+
+    config BSP_USING_RAMDISK_PATH_MOUNT
+        string "Path of ramdisk mount"
+        default "/mnt/tmp" 
+        depends on BSP_USING_RAMDISK 
+endmenu
 
 endmenu 
