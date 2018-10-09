@@ -58,4 +58,25 @@ int main(void)
     extern int chdir(const char *path); 
     chdir(BSP_USING_SDCARD_PATH_MOUNT); 
 #endif
+    
+#if defined(PKG_USING_PLAYER)
+    extern int msh_exec(char *cmd, rt_size_t length); 
+    
+    #define _cmd1 "player -v 65" 
+    msh_exec(_cmd1, rt_strlen(_cmd1)); 
+    
+    #define _cmd2 "listplayer --play" 
+    msh_exec(_cmd2, rt_strlen(_cmd2)); 
+#endif
 }
+
+#if defined(PKG_USING_PLAYER)
+static int _player_init(void)
+{
+    extern int player_system_init(void); 
+    player_system_init(); 
+    
+    return RT_EOK; 
+}
+INIT_COMPONENT_EXPORT(_player_init); 
+#endif
