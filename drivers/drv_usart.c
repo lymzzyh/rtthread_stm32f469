@@ -43,9 +43,9 @@ static rt_err_t drv_configure(struct rt_serial_device *serial,
     RT_ASSERT(serial != RT_NULL);
     RT_ASSERT(cfg != RT_NULL);
     uart = (struct drv_uart *)serial->parent.user_data;
-    uart->UartHandle.Init.BaudRate = cfg->baud_rate;
-    uart->UartHandle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-    uart->UartHandle.Init.Mode = UART_MODE_TX_RX;
+    uart->UartHandle.Init.BaudRate   = cfg->baud_rate;
+    uart->UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
+    uart->UartHandle.Init.Mode       = UART_MODE_TX_RX;
     uart->UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
     switch (cfg->data_bits)
     {
@@ -62,28 +62,28 @@ static rt_err_t drv_configure(struct rt_serial_device *serial,
     switch (cfg->stop_bits)
     {
     case STOP_BITS_1:
-        uart->UartHandle.Init.StopBits = UART_STOPBITS_1;
+        uart->UartHandle.Init.StopBits   = UART_STOPBITS_1;
         break;
     case STOP_BITS_2:
-        uart->UartHandle.Init.StopBits = UART_STOPBITS_2;
+        uart->UartHandle.Init.StopBits   = UART_STOPBITS_2;
         break;
     default:
-        uart->UartHandle.Init.StopBits = UART_STOPBITS_1;
+        uart->UartHandle.Init.StopBits   = UART_STOPBITS_1;
         break;
     }
     switch (cfg->parity)
     {
     case PARITY_NONE:
-        uart->UartHandle.Init.Parity = UART_PARITY_NONE;
+        uart->UartHandle.Init.Parity     = UART_PARITY_NONE;
         break;
     case PARITY_ODD:
-        uart->UartHandle.Init.Parity = UART_PARITY_ODD;
+        uart->UartHandle.Init.Parity     = UART_PARITY_ODD;
         break;
     case PARITY_EVEN:
-        uart->UartHandle.Init.Parity = UART_PARITY_EVEN;
+        uart->UartHandle.Init.Parity     = UART_PARITY_EVEN;
         break;
     default:
-        uart->UartHandle.Init.Parity = UART_PARITY_NONE;
+        uart->UartHandle.Init.Parity     = UART_PARITY_NONE;
         break;
     }
     if (HAL_UART_Init(&uart->UartHandle) != HAL_OK)
@@ -122,8 +122,7 @@ static int drv_putc(struct rt_serial_device *serial, char c)
     struct drv_uart *uart;
     RT_ASSERT(serial != RT_NULL);
     uart = (struct drv_uart *)serial->parent.user_data;
-    while ((__HAL_UART_GET_FLAG(&uart->UartHandle, UART_FLAG_TXE) == RESET))
-        ;
+    while ((__HAL_UART_GET_FLAG(&uart->UartHandle, UART_FLAG_TXE) == RESET));
     uart->UartHandle.Instance->DR = c;
     return 1;
 }
@@ -141,11 +140,11 @@ static int drv_getc(struct rt_serial_device *serial)
 }
 
 static const struct rt_uart_ops drv_uart_ops =
-    {
-        drv_configure,
-        drv_control,
-        drv_putc,
-        drv_getc,
+{
+    drv_configure,
+    drv_control,
+    drv_putc,
+    drv_getc,
 };
 
 #if defined(BSP_USING_UART1)
@@ -160,7 +159,7 @@ void USART1_IRQHandler(void)
     rt_interrupt_enter();
     /* UART in mode Receiver -------------------------------------------------*/
     if ((__HAL_UART_GET_FLAG(&uart->UartHandle, UART_FLAG_RXNE) != RESET) &&
-        (__HAL_UART_GET_IT_SOURCE(&uart->UartHandle, UART_IT_RXNE) != RESET))
+            (__HAL_UART_GET_IT_SOURCE(&uart->UartHandle, UART_IT_RXNE) != RESET))
     {
         rt_hw_serial_isr(&serial1, RT_SERIAL_EVENT_RX_IND);
         /* Clear RXNE interrupt flag */
@@ -183,7 +182,7 @@ void USART2_IRQHandler(void)
     rt_interrupt_enter();
     /* UART in mode Receiver -------------------------------------------------*/
     if ((__HAL_UART_GET_FLAG(&uart->UartHandle, UART_FLAG_RXNE) != RESET) &&
-        (__HAL_UART_GET_IT_SOURCE(&uart->UartHandle, UART_IT_RXNE) != RESET))
+            (__HAL_UART_GET_IT_SOURCE(&uart->UartHandle, UART_IT_RXNE) != RESET))
     {
         rt_hw_serial_isr(&serial2, RT_SERIAL_EVENT_RX_IND);
         /* Clear RXNE interrupt flag */
@@ -206,7 +205,7 @@ void USART3_IRQHandler(void)
     rt_interrupt_enter();
     /* UART in mode Receiver -------------------------------------------------*/
     if ((__HAL_UART_GET_FLAG(&uart->UartHandle, UART_FLAG_RXNE) != RESET) &&
-        (__HAL_UART_GET_IT_SOURCE(&uart->UartHandle, UART_IT_RXNE) != RESET))
+            (__HAL_UART_GET_IT_SOURCE(&uart->UartHandle, UART_IT_RXNE) != RESET))
     {
         rt_hw_serial_isr(&serial3, RT_SERIAL_EVENT_RX_IND);
         /* Clear RXNE interrupt flag */
@@ -218,7 +217,7 @@ void USART3_IRQHandler(void)
 #endif /* BSP_USING_UART3 */
 
 #if defined(BSP_USING_UART6)
-/* UART2 device driver structure */
+/* UART6 device driver structure */
 static struct drv_uart uart6;
 struct rt_serial_device serial6;
 void USART6_IRQHandler(void)
@@ -229,7 +228,7 @@ void USART6_IRQHandler(void)
     rt_interrupt_enter();
     /* UART in mode Receiver -------------------------------------------------*/
     if ((__HAL_UART_GET_FLAG(&uart->UartHandle, UART_FLAG_RXNE) != RESET) &&
-        (__HAL_UART_GET_IT_SOURCE(&uart->UartHandle, UART_IT_RXNE) != RESET))
+            (__HAL_UART_GET_IT_SOURCE(&uart->UartHandle, UART_IT_RXNE) != RESET))
     {
         rt_hw_serial_isr(&serial6, RT_SERIAL_EVENT_RX_IND);
         /* Clear RXNE interrupt flag */
@@ -238,7 +237,7 @@ void USART6_IRQHandler(void)
     /* leave interrupt */
     rt_interrupt_leave();
 }
-#endif /* BSP_USING_UART3 */
+#endif /* BSP_USING_UART6 */
 
 /**
 * @brief UART MSP Initialization
@@ -290,10 +289,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle)
         __HAL_RCC_USART3_CLK_ENABLE();
         __HAL_RCC_GPIOB_CLK_ENABLE();
         /**USART3 GPIO Configuration
-        PB11     ------> USART3_TX
-        PB10     ------> USART3_RX
+        PB10    ------> USART3_TX
+        PB11    ------> USART3_RX
         */
-        GPIO_InitStruct.Pin = GPIO_PIN_11 | GPIO_PIN_10;
+        GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull = GPIO_PULLUP;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -345,10 +344,10 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle)
         /* Peripheral clock disable */
         __HAL_RCC_USART3_CLK_DISABLE();
         /**USART3 GPIO Configuration
-        PB11     ------> USART3_TX
-        PB10     ------> USART3_RX
+        PB10    ------> USART3_TX
+        PB11    ------> USART3_RX
         */
-        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_11 | GPIO_PIN_10);
+        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10 | GPIO_PIN_11);
     }
     else if (uartHandle->Instance == USART6)
     {
@@ -366,12 +365,11 @@ int hw_usart_init(void)
 {
     struct drv_uart *uart;
     struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;
-
 #ifdef BSP_USING_UART1
     uart = &uart1;
     uart->UartHandle.Instance = USART1;
     uart->irq = USART1_IRQn;
-    serial1.ops = &drv_uart_ops;
+    serial1.ops    = &drv_uart_ops;
     serial1.config = config;
     /* register UART1 device */
     rt_hw_serial_register(&serial1, "uart1",
@@ -382,7 +380,7 @@ int hw_usart_init(void)
     uart = &uart2;
     uart->UartHandle.Instance = USART2;
     uart->irq = USART2_IRQn;
-    serial2.ops = &drv_uart_ops;
+    serial2.ops    = &drv_uart_ops;
     serial2.config = config;
     /* register UART2 device */
     rt_hw_serial_register(&serial2, "uart2",
@@ -393,18 +391,18 @@ int hw_usart_init(void)
     uart = &uart3;
     uart->UartHandle.Instance = USART3;
     uart->irq = USART3_IRQn;
-    serial3.ops = &drv_uart_ops;
+    serial3.ops    = &drv_uart_ops;
     serial3.config = config;
-    /* register UART1 device */
+    /* register UART3 device */
     rt_hw_serial_register(&serial3, "uart3",
                           RT_DEVICE_FLAG_RDWR | RT_DEVICE_FLAG_INT_RX,
                           uart);
-#endif /* BSP_USING_UART1 */
+#endif /* BSP_USING_UART3 */
 #ifdef BSP_USING_UART6
     uart = &uart6;
     uart->UartHandle.Instance = USART6;
     uart->irq = USART6_IRQn;
-    serial6.ops = &drv_uart_ops;
+    serial6.ops    = &drv_uart_ops;
     serial6.config = config;
     /* register UART6 device */
     rt_hw_serial_register(&serial6, "uart6",
