@@ -30,7 +30,13 @@ struct stm32_spi
     SPI_TypeDef *Instance;
     struct rt_spi_configuration *cfg;
 };
-
+static int spi_clock_value = 0;
+static int spi_clock(void)
+{
+    rt_kprintf("SPI Clock: %d\n", spi_clock_value);
+    return 0;
+}
+MSH_CMD_EXPORT(spi_clock, show spi clock);
 static rt_err_t stm32_spi_init(SPI_TypeDef *spix, struct rt_spi_configuration *cfg)
 {
     SPI_HandleTypeDef hspi;
@@ -90,35 +96,43 @@ static rt_err_t stm32_spi_init(SPI_TypeDef *spix, struct rt_spi_configuration *c
     }
     if (cfg->max_hz >= HAL_RCC_GetPCLK2Freq() / 2)
     {
+        spi_clock_value = HAL_RCC_GetPCLK2Freq() / 2;
         hspi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
     }
     else if (cfg->max_hz >= HAL_RCC_GetPCLK2Freq() / 4)
     {
+        spi_clock_value = HAL_RCC_GetPCLK2Freq() / 4;
         hspi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
     }
     else if (cfg->max_hz >= HAL_RCC_GetPCLK2Freq() / 8)
     {
+        spi_clock_value = HAL_RCC_GetPCLK2Freq() / 8;
         hspi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
     }
     else if (cfg->max_hz >= HAL_RCC_GetPCLK2Freq() / 16)
     {
+        spi_clock_value = HAL_RCC_GetPCLK2Freq() / 16;
         hspi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
     }
     else if (cfg->max_hz >= HAL_RCC_GetPCLK2Freq() / 32)
     {
+        spi_clock_value = HAL_RCC_GetPCLK2Freq() / 32;
         hspi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
     }
     else if (cfg->max_hz >= HAL_RCC_GetPCLK2Freq() / 64)
     {
+        spi_clock_value = HAL_RCC_GetPCLK2Freq() / 64;
         hspi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
     }
     else if (cfg->max_hz >= HAL_RCC_GetPCLK2Freq() / 128)
     {
+        spi_clock_value = HAL_RCC_GetPCLK2Freq() / 128;
         hspi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_128;
     }
     else
     {
         /*  min prescaler 256 */
+        spi_clock_value = HAL_RCC_GetPCLK2Freq() / 256;
         hspi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
     }
     if (cfg->mode & RT_SPI_MSB)

@@ -16,7 +16,7 @@ void spi_wifi_hw_init(void)
     rt_pin_mode(RESET_PIN, PIN_MODE_OUTPUT);
     
     rt_pin_attach_irq(INT_BUSY_PIN, PIN_IRQ_MODE_FALLING, (void(*)(void *))spi_wifi_isr, 0);
-    
+    rt_pin_irq_enable(INT_BUSY_PIN, RT_TRUE);
     //reset
     rt_pin_write(RESET_PIN, PIN_LOW);
     rt_thread_delay(rt_tick_from_millisecond(100));
