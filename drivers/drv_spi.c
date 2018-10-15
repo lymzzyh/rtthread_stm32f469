@@ -28,7 +28,10 @@ struct stm32_hw_spi_cs
 struct stm32_spi
 {
     SPI_TypeDef *Instance;
+    uint32_t idx;
     struct rt_spi_configuration *cfg;
+    DMA_HandleTypeDef hdma_tx;
+    DMA_HandleTypeDef hdma_rx;
 };
 static int spi_clock_value = 0;
 static int spi_clock(void)
@@ -37,6 +40,42 @@ static int spi_clock(void)
     return 0;
 }
 MSH_CMD_EXPORT(spi_clock, show spi clock);
+
+struct spi_dma
+{
+    DMA_Stream_TypeDef * dma_stream;
+    uint32_t channel;
+};
+
+#define SPI_DMA(dma, stream, channel)   {DMA##dma##_Stream##stream, DMA_CHANNEL_##channel}
+
+static struct spi_dma tx_dma_table[] = 
+{
+    SPI_DMA(2, 3, 3),
+    SPI_DMA(1, 4, 0),
+    SPI_DMA(1, 5, 0),
+};
+
+static struct spi_dma rx_dma_table[] = 
+{
+    SPI_DMA(2, 0, 3),
+    SPI_DMA(1, 3, 0),
+    SPI_DMA(1, 0, 0),
+};
+
+static SPI_TypeDef* spi_instance[] = 
+{
+    SPI1,
+    SPI2,
+    SPI3,
+};
+    
+
+static rt_err_t stm32_spi_dma_init(struct stm32_spi *spi)
+{
+    
+}
+
 static rt_err_t stm32_spi_init(SPI_TypeDef *spix, struct rt_spi_configuration *cfg)
 {
     SPI_HandleTypeDef hspi;
@@ -251,9 +290,11 @@ static rt_uint32_t spixfer(struct rt_spi_device *device, struct rt_spi_message *
 rt_err_t spi_configure(struct rt_spi_device *device,
                        struct rt_spi_configuration *configuration)
 {
+    rt_err_t result;
     struct stm32_spi *hspi = (struct stm32_spi *)device->bus->parent.user_data;
     hspi->cfg = configuration;
-    return stm32_spi_init(hspi->Instance, configuration);
+    result = stm32_spi_init(hspi->Instance, configuration);
+    return result;
 }
 const struct rt_spi_ops stm_spi_ops =
 {
@@ -263,6 +304,7 @@ const struct rt_spi_ops stm_spi_ops =
 
 struct rt_spi_bus _spi_bus1, _spi_bus2, _spi_bus3;
 struct stm32_spi _spi1, _spi2, _spi3;
+
 int stm32_spi_register_bus(SPI_TypeDef *SPIx, const char *name)
 {
     struct rt_spi_bus *spi_bus;
