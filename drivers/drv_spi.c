@@ -157,13 +157,14 @@ static rt_uint32_t spixfer(struct rt_spi_device *device, struct rt_spi_message *
     {
         struct stm32_spi *hspi = (struct stm32_spi *)device->bus->parent.user_data;
         struct stm32_hw_spi_cs *cs = device->parent.user_data;
-        static char dummy = 0xFF;
+        static char dummy = 0;
         
         uint32_t send_addr = (uint32_t)&dummy;
         uint32_t recv_addr = (uint32_t)&dummy;
         uint32_t transfer_size = 0;
         uint32_t remain_size = message->length;
         
+        dummy = 0;
         /* Config DMA */
         
         hspi->hdma_tx.Instance                 = tx_dma_table[hspi->idx].dma_stream;
