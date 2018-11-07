@@ -22,13 +22,17 @@ documentation/html
 *.a
 *.i
 *.d
-tools/kconfig-frontends/kconfig-mconf
 cconfig.h
 GPUCache
-/*.liuguang
-template.uvoptx
 *.uvguix.*
+<<<<<<< HEAD
 DebugConfig/
 /*.uvoptx
 /JLinkLog.txt
 /JLinkSettings.ini
+=======
+DebugConfig
+JLinkLog.txt
+JLinkSettings.ini
+*.dbsqlite
+>>>>>>> ff05f80... 更新ignore和工程
