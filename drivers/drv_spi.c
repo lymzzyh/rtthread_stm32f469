@@ -52,12 +52,12 @@ struct spi_dma
 
 
 #define SPI_DMA(dma, stream, channel)   {DMA##dma##_Stream##stream, DMA_CHANNEL_##channel, DMA##dma##_Stream##stream##_IRQn}
-#define SPI1_DMA_IRQ_HANDLE DMA2_Stream3_IRQHandler
+#define SPI1_DMA_IRQ_HANDLE DMA2_Stream5_IRQHandler
 #define SPI2_DMA_IRQ_HANDLE DMA1_Stream4_IRQHandler
 #define SPI3_DMA_IRQ_HANDLE DMA1_Stream5_IRQHandler
 static struct spi_dma tx_dma_table[] = 
 {
-    SPI_DMA(2, 3, 3),
+    SPI_DMA(2, 5, 3),
     SPI_DMA(1, 4, 0),
     SPI_DMA(1, 5, 0),
 };
