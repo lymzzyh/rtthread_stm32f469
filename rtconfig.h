@@ -186,15 +186,6 @@
 
 /* example package: hello */
 
-
-/* Privated Packages of RealThread */
-
-
-/* Network Utilities */
-
-
-/* rtpkgs online packages */
-
 #define SOC_STM32F469NI
 
 /* STM32 Bsp Config */

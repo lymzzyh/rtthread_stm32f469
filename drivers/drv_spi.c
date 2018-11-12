@@ -150,7 +150,6 @@ void spi_XferCpltCallback(DMA_HandleTypeDef *hdma)
 static rt_uint32_t spixfer(struct rt_spi_device *device, struct rt_spi_message *message)
 #ifdef SPI_USING_DMA
 {
-    rt_err_t res;
     RT_ASSERT(device != RT_NULL);
     RT_ASSERT(device->bus != RT_NULL);
     RT_ASSERT(device->bus->parent.user_data != RT_NULL);

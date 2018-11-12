@@ -225,7 +225,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
-
+#include <string.h>
 /** @addtogroup STM32F4xx_HAL_Driver
   * @{
   */
