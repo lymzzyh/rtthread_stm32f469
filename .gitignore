@@ -25,14 +25,7 @@ documentation/html
 cconfig.h
 GPUCache
 *.uvguix.*
-<<<<<<< HEAD
-DebugConfig/
-/*.uvoptx
-/JLinkLog.txt
-/JLinkSettings.ini
-=======
 DebugConfig
 JLinkLog.txt
 JLinkSettings.ini
 *.dbsqlite
->>>>>>> ff05f80... 更新ignore和工程
