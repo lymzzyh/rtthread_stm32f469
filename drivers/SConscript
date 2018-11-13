@@ -24,7 +24,7 @@ if GetDepend(['RT_USING_PIN']):
 if GetDepend(['BSP_USING_I2C2']):
 	src += ['drv_i2c.c']
 
-if GetDepend(['BSP_USING_SPI']):
+if GetDepend(['RT_USING_SPI']):
     src += ['drv_spi.c']
 
 if GetDepend(['BSP_USING_SDRAM']):
@@ -49,8 +49,8 @@ if GetDepend(['BSP_USING_RAMDISK']):
 if GetDepend(['RT_USING_USB_DEVICE']):
     src += ['drv_usbd.c']
 
-if GetDepend(['RT_USING_USB_DEVICE']):
-    src += ['drv_usbd.c']
+if GetDepend(['RT_USING_SPI_WIFI']):
+    src += ['drv_rw00x.c']
 
 group = DefineGroup('Drivers', src, depend = [''], CPPPATH = inc)
 

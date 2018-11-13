@@ -225,7 +225,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
-
+#include <string.h>
 /** @addtogroup STM32F4xx_HAL_Driver
   * @{
   */
@@ -1965,6 +1965,8 @@ HAL_StatusTypeDef HAL_SD_GetCardStatus(SD_HandleTypeDef *hsd, HAL_SD_CardStatusT
   uint32_t sd_status[16U];
   uint32_t errorstate = HAL_SD_ERROR_NONE;
   
+  memset(sd_status, 0, sizeof(sd_status));
+
   errorstate = SD_SendSDStatus(hsd, sd_status);
   if(errorstate != HAL_OK)
   {

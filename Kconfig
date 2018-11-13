@@ -81,11 +81,6 @@ menu "Select spi bus drivers"
         bool "Using spi2 bus"
         select RT_USING_SPI
         default n  
-
-    config BSP_USING_SPI3
-        bool "Using spi3 bus"
-        select RT_USING_SPI
-        default n 
 endmenu
 
 menu "Select sdram drivers"
