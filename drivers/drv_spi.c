@@ -17,7 +17,6 @@
 #include <rthw.h>
 #ifdef RT_USING_SPI
 
-#define SPI_USING_DMA
 struct stm32_hw_spi_cs
 {
     rt_uint32_t pin;

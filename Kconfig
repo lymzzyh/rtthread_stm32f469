@@ -81,6 +81,11 @@ menu "Select spi bus drivers"
         bool "Using spi2 bus"
         select RT_USING_SPI
         default n  
+    if BSP_USING_SPI1 || BSP_USING_SPI2
+        config SPI_USING_DMA
+            bool "Enable dma on spi"
+            default y
+    endif
 endmenu
 
 menu "Select sdram drivers"
