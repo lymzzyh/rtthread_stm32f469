@@ -217,7 +217,7 @@ static rt_uint32_t spixfer(struct rt_spi_device *device, struct rt_spi_message *
         HAL_DMA_DeInit(&hspi->hdma_tx);
         HAL_DMA_DeInit(&hspi->hdma_rx);
         
-        HAL_NVIC_SetPriority(tx_dma_table[hspi->idx].irq_n, 1, 1);
+        HAL_NVIC_SetPriority(tx_dma_table[hspi->idx].irq_n, 1, 0);
         HAL_NVIC_EnableIRQ  (tx_dma_table[hspi->idx].irq_n);
         /* Transmit Begin */
         
@@ -533,7 +533,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *spiHandle)
         /* SPI2 clock enable */
         __HAL_RCC_SPI2_CLK_ENABLE();
         __HAL_RCC_GPIOB_CLK_ENABLE();
-        __HAL_RCC_GPIOC_CLK_ENABLE();
+        __HAL_RCC_GPIOD_CLK_ENABLE();
         __HAL_RCC_DMA1_CLK_ENABLE();
         /**SPI2 GPIO Configuration
         PD3      ------> SPI2_SCK
@@ -545,11 +545,11 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *spiHandle)
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
         GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
         
-        GPIO_InitStruct.Pin = GPIO_PIN_13;
-        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+        GPIO_InitStruct.Pin = GPIO_PIN_3;
+        HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
         
-        GPIO_InitStruct.Pin = GPIO_PIN_3 | GPIO_PIN_2;
-        HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+        GPIO_InitStruct.Pin = GPIO_PIN_14 | GPIO_PIN_15;
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
         
     }
 }
@@ -577,8 +577,8 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef *spiHandle)
         PB14     ------> SPI2_MISO
         PB15     ------> SPI2_MOSI
         */
-        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_13);
-        HAL_GPIO_DeInit(GPIOC, GPIO_PIN_3 | GPIO_PIN_2);
+        HAL_GPIO_DeInit(GPIOD, GPIO_PIN_3);
+        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_14 | GPIO_PIN_15);
     }
 }
 #endif /*RT_USING_SPI*/

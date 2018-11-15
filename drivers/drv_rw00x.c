@@ -1,11 +1,11 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 #include <drv_spi.h>
-#define SPI_BUS_NAME    "spi1"
-#define CS_PIN          168 //PA15
-#define INT_BUSY_PIN    149 //PA8
-#define RESET_PIN       10  //PC13
-#define MODE_BIT0_PIN   60  //PA5
+#define SPI_BUS_NAME    "spi2"
+#define CS_PIN          102 //PH6
+#define INT_BUSY_PIN    62  //PA7
+#define RESET_PIN       187 //PG10
+#define MODE_BIT0_PIN   175 //PD3
 #define MODE_BIT1_PIN   CS_PIN
 #define MODE_READY_PIN  INT_BUSY_PIN
 extern void spi_wifi_isr(int vector);
