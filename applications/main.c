@@ -19,6 +19,10 @@
 #include <dfs_posix.h>
 #endif
 
+#ifdef RT_USING_SPI_WIFI
+#include <spi_wifi_rw009.h>
+#endif
+
 int main(void)
 {   
 #if defined(BSP_USING_RAMDISK) && defined(BSP_USING_RAMDISK_MOUNT) 
@@ -26,8 +30,7 @@ int main(void)
     
     if(dfs_mount("ram0", BSP_USING_RAMDISK_PATH_MOUNT, "elm", 0, 0) != 0)
     {
-        rt_kprintf("sdcard mount '%s' failed.\n", BSP_USING_RAMDISK_PATH_MOUNT); 
-        return RT_ERROR; 
+        rt_kprintf("sdcard mount '%s' failed.\n", BSP_USING_RAMDISK_PATH_MOUNT);  
     }
 #endif
     
@@ -38,8 +41,7 @@ int main(void)
         /* mount sd card fat partition 1 as root directory */
         if (dfs_mount("sd0", BSP_USING_SDCARD_PATH_MOUNT, "elm", 0, 0) == 0)
         {
-            rt_kprintf("sdcard mount '%s' failed.\n", BSP_USING_SDCARD_PATH_MOUNT); 
-            return RT_ERROR; 
+            rt_kprintf("sdcard mount '%s' failed.\n", BSP_USING_SDCARD_PATH_MOUNT);  
         }
         extern int chdir(const char *path); 
         chdir(BSP_USING_SDCARD_PATH_MOUNT);
@@ -52,7 +54,6 @@ int main(void)
     if(dfs_mount("sd0", BSP_USING_SDCARD_PATH_MOUNT, "elm", 0, 0) != 0)
     {
         rt_kprintf("sdcard mount '%s' failed.\n", BSP_USING_SDCARD_PATH_MOUNT); 
-        return RT_ERROR; 
     }
     
     extern int chdir(const char *path); 
@@ -70,6 +71,7 @@ int main(void)
 #endif
 
 #ifdef RT_USING_SPI_WIFI
+    extern void wifi_spi_device_init(const char * device_name);
     wifi_spi_device_init("wspi");
     rt_hw_wifi_init("wspi",MODE_STATION);
 #endif
