@@ -1,10 +1,6 @@
 {
     "files.associations": {
-        "drv_lcd.h": "c",
-        "drv_cs43l22.h": "c",
-        "rtthread.h": "c",
-        "drv_codec.h": "c",
-        "rtdevice.h": "c",
-        "dfs_file.h": "c"
+        "SConscript": "python",
+        "SConstruct": "python",
     }
 }
