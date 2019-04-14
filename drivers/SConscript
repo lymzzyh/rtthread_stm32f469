@@ -1,7 +1,7 @@
 Import('RTT_ROOT')
 Import('rtconfig')
 from building import * 
-
+import os
 # get current dir path
 cwd = GetCurrentDir()
 
@@ -11,13 +11,15 @@ inc = []
 
 # add dwin basic include
 inc = inc + [cwd]
-
+inc = inc + [os.path.join(cwd, 'audio_in'), os.path.join(cwd, 'audio_in/Inc')]
+libpath = [os.path.join(cwd, 'audio_in/Lib')]
+libs = ['PDMFilter_CM4_GCC_wc32']
 # add dwin basic code
 src += ['board.c']
 src += ['stm32f4xx_it.c']
 src += ['drv_usart.c']
 src += ['drv_romfs.c']
-
+src += ['audio_in/drv_audio_in.c']
 if GetDepend(['RT_USING_PIN']):
     src += ['drv_gpio.c']
 
@@ -49,12 +51,9 @@ if GetDepend(['BSP_USING_RAMDISK']):
 if GetDepend(['RT_USING_USB_DEVICE']):
     src += ['drv_usbd.c']
 
-if GetDepend(['RT_USING_SPI_WIFI']):
-    src += ['drv_rw00x.c']
-
 if GetDepend(['BSP_USING_QSPI_FLASH']):
     src += ['drv_qspi.c', 'stm32469i_discovery_qspi.c']
 
-group = DefineGroup('Drivers', src, depend = [''], CPPPATH = inc)
+group = DefineGroup('Drivers', src, LIBS = libs, LIBPATH = libpath, depend = [''], CPPPATH = inc)
 
 Return('group')
