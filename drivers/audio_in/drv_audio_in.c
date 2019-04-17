@@ -10,6 +10,7 @@
 #define PCM_OUT_SIZE                        (I2S_AUDIOFREQ_16K/1000*2)//32
 #define CHANNEL_DEMUX_MASK                  ((uint8_t)0x55)
 
+ALIGN(4)
 static uint16_t mic_pdm_buffer[INTERNAL_BUFF_SIZE];
 static rt_mailbox_t mic_mb;
 static rt_mp_t mic_mp;
@@ -47,7 +48,7 @@ int mic_init(void)
     i2s_init(&haudio_in_i2s, SPI3);
     PDMDecoder_Init(I2S_AUDIOFREQ_16K, 2, 2);
 }
-//INIT_APP_EXPORT(mic_init);
+INIT_APP_EXPORT(mic_init);
 
 void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
 {
@@ -254,7 +255,7 @@ void DMA1_Stream2_IRQHandler(void)
 
 static int pdm2pcm(uint16_t *pdmbuf, uint16_t *pcmbuf)
 {
-    uint8_t app_pdm[INTERNAL_BUFF_SIZE * 2];
+    static uint8_t app_pdm[INTERNAL_BUFF_SIZE * 2];
     uint8_t byte1 = 0, byte2 = 0;
     uint32_t index = 0;
 

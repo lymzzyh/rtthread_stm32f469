@@ -66,6 +66,7 @@
 #define RT_VER_NUM 0x40001
 #define ARCH_ARM
 #define ARCH_ARM_CORTEX_M
+#define ARCH_ARM_CORTEX_FPU
 #define ARCH_ARM_CORTEX_M4
 /* ARCH_CPU_STACK_GROWS_UPWARD is not set */
 
@@ -73,7 +74,7 @@
 
 #define RT_USING_COMPONENTS_INIT
 #define RT_USING_USER_MAIN
-#define RT_MAIN_THREAD_STACK_SIZE 2048
+#define RT_MAIN_THREAD_STACK_SIZE 8192
 #define RT_MAIN_THREAD_PRIORITY 10
 
 /* C++ features */
@@ -300,7 +301,19 @@
 /* PKG_USING_SQLITE is not set */
 /* PKG_USING_RTI is not set */
 /* PKG_USING_LITTLEVGL2RTT is not set */
-/* PKG_USING_CMSIS is not set */
+#define PKG_USING_CMSIS
+#define PKG_USING_CMSIS_LATEST_VERSION
+/* PKG_USING_CMSIS_V500 is not set */
+#define PKG_CMSIS_CORE
+#define PKG_CMSIS_NN
+#define PKG_CMSIS_NN_ACTIVATION
+#define PKG_CMSIS_NN_CONVOLUTION
+#define PKG_CMSIS_NN_FULLY_CONNECTED
+#define PKG_CMSIS_NN_SUPPORT
+#define PKG_CMSIS_NN_POOLING
+#define PKG_CMSIS_NN_SOFTMAX
+#define PKG_CMSIS_DSP
+/* PKG_CMSIS_RTOS2 is not set */
 /* PKG_USING_DFS_YAFFS is not set */
 #define PKG_USING_LITTLEFS
 #define PKG_USING_LITTLEFS_V090
@@ -339,7 +352,14 @@
 /* PKG_USING_FASTLZ is not set */
 /* PKG_USING_MINILZO is not set */
 /* PKG_USING_QUICKLZ is not set */
-/* PKG_USING_MULTIBUTTON is not set */
+#define PKG_USING_MULTIBUTTON
+#define PKG_USING_MULTIBUTTON_V102
+/* PKG_USING_MULTIBUTTON_LATEST_VERSION is not set */
+
+/* MultiButton Options */
+
+/* MULTIBUTTON_USING_EXAMPLE_ASYNC is not set */
+/* MULTIBUTTON_USING_EXAMPLE_INQUIRE is not set */
 /* PKG_USING_CANFESTIVAL is not set */
 /* PKG_USING_ZLIB is not set */
 /* PKG_USING_DSTR is not set */
@@ -354,7 +374,9 @@
 /* PKG_USING_PERIPHERAL_SAMPLES is not set */
 /* PKG_USING_HELLO is not set */
 /* PKG_USING_VI is not set */
-/* PKG_USING_NNOM is not set */
+#define PKG_USING_NNOM
+/* PKG_USING_NNOM_V010 is not set */
+#define PKG_USING_NNOM_LATEST_VERSION
 
 /* Privated Packages of RealThread */
 
