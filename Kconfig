@@ -102,6 +102,9 @@ menu "Select audio drivers"
         bool "Using audio" 
         default n 
         select BSP_USING_I2C2
+    config BSP_USING_AUDIO_IN
+        bool "Using audio in" 
+        default n 
 endmenu
 
 menu "Select sdcard drivers"

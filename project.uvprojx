@@ -547,6 +547,11 @@
               <FileType>1</FileType>
               <FilePath>drivers\stm32469i_discovery_qspi.c</FilePath>
             </File>
+            <File>
+              <FileName>libPDMFilter_CM4_Keil_wc16.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>drivers\audio_in\Lib\libPDMFilter_CM4_Keil_wc16.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

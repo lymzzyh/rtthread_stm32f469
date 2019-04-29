@@ -230,6 +230,7 @@
 
 /* Select audio drivers */
 
+#define BSP_USING_AUDIO_IN
 
 /* Select sdcard drivers */
 

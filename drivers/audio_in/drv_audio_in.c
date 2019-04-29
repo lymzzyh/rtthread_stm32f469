@@ -47,6 +47,7 @@ int mic_init(void)
     pass_tim_init(TIM4, TIM_CHANNEL_1, TIM_CHANNEL_2);
     i2s_init(&haudio_in_i2s, SPI3);
     PDMDecoder_Init(I2S_AUDIOFREQ_16K, 2, 2);
+    return 0;
 }
 INIT_APP_EXPORT(mic_init);
 
@@ -89,14 +90,6 @@ void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
 }
 static int i2s_init(I2S_HandleTypeDef *hi2s, SPI_TypeDef *Instace)
 {
-    RCC_PeriphCLKInitTypeDef RCC_ExCLKInitStruct;
-  
-    // HAL_RCCEx_GetPeriphCLKConfig(&RCC_ExCLKInitStruct);
-    // RCC_ExCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2S;
-    // RCC_ExCLKInitStruct.PLLI2S.PLLI2SN = 384;
-    // RCC_ExCLKInitStruct.PLLI2S.PLLI2SR = 2;
-    // HAL_RCCEx_PeriphCLKConfig(&RCC_ExCLKInitStruct);
-
     hi2s->Instance = SPI3;
 
     hi2s->Init.AudioFreq = 4 * I2S_AUDIOFREQ_16K;//1.022MHz
@@ -215,6 +208,7 @@ static int dma_config(I2S_HandleTypeDef *hi2s)
 
     HAL_NVIC_SetPriority(DMA1_Stream2_IRQn, 6, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+    return 0;
 }
 
 static int PDMDecoder_Init(uint32_t AudioFreq, uint32_t ChnlNbrIn, uint32_t ChnlNbrOut)
@@ -240,6 +234,7 @@ static int PDMDecoder_Init(uint32_t AudioFreq, uint32_t ChnlNbrIn, uint32_t Chnl
         PDM_FilterConfig[index].decimation_factor = PDM_FILTER_DEC_FACTOR_64;
         PDM_Filter_setConfig((PDM_Filter_Handler_t *)&PDM_FilterHandler[index], &PDM_FilterConfig[index]);
     }
+    return 0;
 }
 
 void DMA1_Stream2_IRQHandler(void)
@@ -278,7 +273,6 @@ static int pdm2pcm(uint16_t *pdmbuf, uint16_t *pcmbuf)
     return 0;
 }
 static uint16_t * ppcm_buffer;
-static uint32_t pcm_offset;
 void HAL_I2S_RxCpltCallback(I2S_HandleTypeDef *hi2s)
 {
     uint16_t * ppdm_buffer = &mic_pdm_buffer[INTERNAL_BUFF_SIZE/2];

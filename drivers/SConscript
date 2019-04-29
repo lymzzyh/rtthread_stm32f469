@@ -12,14 +12,24 @@ inc = []
 # add dwin basic include
 inc = inc + [cwd]
 inc = inc + [os.path.join(cwd, 'audio_in'), os.path.join(cwd, 'audio_in/Inc')]
-libpath = [os.path.join(cwd, 'audio_in/Lib')]
-libs = ['PDMFilter_CM4_GCC_wc32']
+libpath = []
+libs = []
 # add dwin basic code
 src += ['board.c']
 src += ['stm32f4xx_it.c']
 src += ['drv_usart.c']
 src += ['drv_romfs.c']
-src += ['audio_in/drv_audio_in.c']
+
+if GetDepend(['BSP_USING_AUDIO_IN']):
+    src += ['audio_in/drv_audio_in.c']
+    libpath = [os.path.join(cwd, 'audio_in/Lib')]
+    if rtconfig.PLATFORM == 'gcc':
+        libs = ['PDMFilter_CM4_GCC_wc32']
+    elif rtconfig.PLATFORM == 'armcc':
+        libs = ['libPDMFilter_CM4_Keil_wc16']
+    elif rtconfig.PLATFORM == 'iar':
+        libs = ['PDMFilter_CM4_IAR_wc16', 'PDMFilter_CM4_IAR_wc32']
+
 if GetDepend(['RT_USING_PIN']):
     src += ['drv_gpio.c']
 
