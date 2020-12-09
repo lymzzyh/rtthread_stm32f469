@@ -16,7 +16,6 @@ libpath = []
 libs = []
 # add dwin basic code
 src += ['board.c']
-src += ['stm32f4xx_it.c']
 src += ['drv_usart.c']
 src += ['drv_romfs.c']
 
@@ -63,6 +62,9 @@ if GetDepend(['RT_USING_USB_DEVICE']):
 
 if GetDepend(['BSP_USING_QSPI_FLASH']):
     src += ['drv_qspi.c', 'stm32469i_discovery_qspi.c']
+
+if GetDepend(['RT_USING_PWM']):
+    src += ['drv_pwm.c']  
 
 group = DefineGroup('Drivers', src, LIBS = libs, LIBPATH = libpath, depend = [''], CPPPATH = inc)
 
